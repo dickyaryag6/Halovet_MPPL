@@ -1,59 +1,62 @@
 package main
 
 import (
-  . "fmt"
-  "log"
-  "net/http"
-  "github.com/gorilla/mux"
-  handler "Halovet/handler/http"
-  mid "Halovet/middleware"
-  "github.com/rs/cors"
+	handler "Halovet/handler/http"
+	mid "Halovet/middleware"
+	"fmt"
 
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
-  Println("Endpoint Hit: homepage")
-  Fprintf(w, "Welcome to Homepage")
+	log.Println("Endpoint Hit: homepage")
+	fmt.Fprintf(w, "Welcome to Homepage")
 }
 
 func handleRequest() {
 
-  router := mux.NewRouter().StrictSlash(true)
-  router.HandleFunc("/", index)
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", index)
 
-  account := router.PathPrefix("/account").Subrouter()
+	// ACCOUNT
+	account := router.PathPrefix("/account").Subrouter()
+	account.HandleFunc("/register", handler.Register).Methods("POST")
+	account.HandleFunc("/login", handler.Login).Methods("POST")
+	account.HandleFunc("/logout", handler.Logout)
 
+	// APPOINTMENT
+	appointment := router.PathPrefix("/appointment").Subrouter()
+	appointment.Use(mid.JWTAuthorization)
+	appointment.HandleFunc("", handler.CreateAppointment).Methods("POST")
+	appointment.HandleFunc("/{id}/uploadPayment", handler.UploadPayment).Methods("POST")
+	// appointment.HandleFunc("", handler.GetAllAppointments).Methods("GET")
+	appointment.HandleFunc("/{id}", handler.GetAppointmentByID).Methods("GET")
+	appointment.HandleFunc("/{id}", handler.DeleteAppointment).Methods("DELETE")
+	appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")
 
-  account.HandleFunc("/register", handler.Register).Methods("POST")
-  account.HandleFunc("/login", handler.Login).Methods("POST")
-  account.HandleFunc("/logout", handler.Logout)
+	// FORUM
+	// appointment := router.PathPrefix("/forum").Subrouter()
+	// appointment.Use(mid.MiddlewareJWTAuthorization)
+	// appointment.HandleFunc("", handler.CreateTopic).Methods("POST")
+	// appointment.HandleFunc("{topicid}/reply", handler.ReplyTopic).Methods("POST")
 
-  appointment := router.PathPrefix("/appointment").Subrouter()
-  appointment.Use(mid.MiddlewareJWTAuthorization)
-  appointment.HandleFunc("", handler.CreateAppointment).Methods("POST")
-  // appointment.HandleFunc("", handler.GetAllAppointments).Methods("GET")
-  appointment.HandleFunc("/{id}", handler.GetAppointmentByID).Methods("GET")
-  appointment.HandleFunc("/{id}", handler.DeleteAppointment).Methods("DELETE")
-  appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"*"},
+	})
 
-  // appointment := router.PathPrefix("/forum").Subrouter()
-  // appointment.Use(mid.MiddlewareJWTAuthorization)
-  // appointment.HandleFunc("", handler.CreateTopic).Methods("POST")
-  // appointment.HandleFunc("{topicid}/reply", handler.ReplyTopic).Methods("POST")
+	handler := c.Handler(router)
 
-  c := cors.New(cors.Options{
-  AllowedOrigins  :   []string{"*"},
-  AllowCredentials:   true,
-  AllowedMethods  :   []string{"*"},
-  })
-
-  handler := c.Handler(router)
-
-  Println("Server listen at :8000")
-  log.Fatal(http.ListenAndServe(":8000", handler))
+	log.Println("Server listen at :8000")
+	log.Fatal(http.ListenAndServe(":8000", handler))
 
 }
 
 func main() {
-  handleRequest()
+	handleRequest()
 }

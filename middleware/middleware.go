@@ -1,78 +1,84 @@
 package middleware
 
 import (
-  "net/http"
-  . "fmt"
-  // "reflect"
-  "time"
-  jwt "github.com/dgrijalva/jwt-go"
-  "strings"
-  "context"
-  // "os"
-  // "github.com/joho/godotenv"
-  // "log"
+	. "fmt"
+	"net/http"
+
+	// "reflect"
+	"context"
+	"strings"
+	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	// "os"
+	// "github.com/joho/godotenv"
+	// "log"
 )
 
-var LOGIN_EXP_DURATION = time.Duration(1) * time.Hour
-var JWT_SIGNING_METHOD = jwt.SigningMethodHS256
+// LoginExpDuration : Durasi Token Berlaku/Valid
+var LoginExpDuration = time.Duration(1) * time.Hour
 
+// JwtSigningMethod : Metode Pembuatan Token
+var JwtSigningMethod = jwt.SigningMethodHS256
 
-func MiddlewareJWTAuthorization(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// JWTAuthorization : fungsi pembuatan JWT
+func JWTAuthorization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-    jwtSignKey:="notsosecret"
-    //
-    // url:=r.URL.Path
-    // if itemExists(noAuthSlice, url){
-    //   next.ServeHTTP(w, r)
-    //   return
-    // }
+		jwtSignKey := "notsosecret"
+		//
+		// url:=r.URL.Path
+		// if itemExists(noAuthSlice, url){
+		//   next.ServeHTTP(w, r)
+		//   return
+		// }
 
-    if r.URL.Path == "account/login" {
-            next.ServeHTTP(w, r)
-            return
-    }
-    //ambil data yang dikirim ke http, in this case,
-    ctx := r.Context()
-    if ctx == nil {
-        ctx = context.Background()
-    }
+		if r.URL.Path == "account/login" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		//ambil data yang dikirim ke http, in this case,
+		ctx := r.Context()
+		if ctx == nil {
+			ctx = context.Background()
+		}
 
-    // ambil token yg dikasi user
-    authorizationHeader := r.Header.Get("Authorization")
-    if !strings.Contains(authorizationHeader, "Bearer") {
-      http.Error(w, "Invalid token", http.StatusBadRequest)
-      return
-    }
+		// ambil token yg dikasi user
+		authorizationHeader := r.Header.Get("Authorization")
+		if !strings.Contains(authorizationHeader, "Bearer") {
+			http.Error(w, "Invalid token", http.StatusBadRequest)
+			return
+		}
 
-    tokenString := strings.Replace(authorizationHeader, "Bearer ", "", -1)
+		tokenString := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
-    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, Errorf("Signing method invalid")
-        } else if method != JWT_SIGNING_METHOD {
-            return nil, Errorf("Signing method invalid")
-        }
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, Errorf("Signing method invalid")
+			} else if method != JwtSigningMethod {
+				return nil, Errorf("Signing method invalid")
+			}
 
-        return []byte(jwtSignKey), nil
-    })
+			return []byte(jwtSignKey), nil
+		})
 
-    if err != nil {
-      http.Error(w, err.Error(), http.StatusBadRequest)
-      return
-    }
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-    claims, ok := token.Claims.(jwt.MapClaims)
-    if !ok || !token.Valid {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-    // Jika melihat struct http.Request maka  di dalamnya
-    // terdapat context. Setiap request yang datang akan diset otomatis menjadi ctx.Background().
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		// Jika melihat struct http.Request maka  di dalamnya
+		// terdapat context. Setiap request yang datang akan diset otomatis menjadi ctx.Background().
 
-    // ctx := context.WithValue(context.Background(), "userInfo", claims)?
-    ctx = context.WithValue(ctx, "userInfo", claims)
-    r = r.WithContext(ctx)
+		// ctx := context.WithValue(context.Background(), "userInfo", claims)?
+		ctx = context.WithValue(ctx, "userInfo", claims)
+		r = r.WithContext(ctx)
 
-    next.ServeHTTP(w, r)
-})}
+		next.ServeHTTP(w, r)
+	})
+}
