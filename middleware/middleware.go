@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"fmt"
 	. "fmt"
 	"net/http"
+	"strconv"
 
 	// "reflect"
 	"context"
@@ -79,6 +81,45 @@ func JWTAuthorization(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "userInfo", claims)
 		r = r.WithContext(ctx)
 
+		next.ServeHTTP(w, r)
+	})
+}
+
+// PetOwner : Middleware PetOwner
+func PetOwner(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//CEK APAKAH PET OWNER APA BUKAN
+
+		userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
+		user := userInfo["User"]
+		userReal, _ := user.(map[string]interface{})
+		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
+		if err == nil {
+			fmt.Println(Role)
+		}
+		if Role != 1 {
+			w.Write([]byte("Pet Owner is not allowed to do this method"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+// Doctor : Middleware Doctor
+func Doctor(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//CEK APAKAH DOCTOR APA BUKAN
+		userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
+		user := userInfo["User"]
+		userReal, _ := user.(map[string]interface{})
+		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
+		if err == nil {
+			fmt.Println(Role)
+		}
+		if Role != 2 {
+			w.Write([]byte("Doctor is not allowed to do this method"))
+			return
+		}
 		next.ServeHTTP(w, r)
 	})
 }

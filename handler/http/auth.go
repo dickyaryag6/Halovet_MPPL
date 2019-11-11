@@ -52,13 +52,13 @@ func checkErr(w http.ResponseWriter, r *http.Request, err error) bool {
 }
 
 // QueryUser : ngecek apakah sudah ada user dengan email tersebut
-func QueryUser(email string) (bool, models.Pet_Owner) {
+func QueryUser(email string) (bool, models.Account) {
 
-	var user models.Pet_Owner
+	var user models.Account
 	// Println(email)
-	sqlStatement := "SELECT id,email,name,password FROM pet_owner WHERE email=?"
+	sqlStatement := "SELECT email,name,password,role FROM account WHERE email=?"
 	err = db.QueryRow(sqlStatement, email).
-		Scan(&user.ID, &user.Email, &user.Name, &user.Password)
+		Scan(&user.Email, &user.Name, &user.Password, &user.Role)
 	if err == sql.ErrNoRows {
 		return false, user
 	}
@@ -208,16 +208,24 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// kalo status true, berarti print email terdaftar
 
 	if status {
-		Println("Email sudah terdaftar")
+		message := "Email sudah terdaftar"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		response.Status = true
+		response.Message = message
+		json.NewEncoder(w).Encode(response)
+		return
+
 	} else {
 		// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 		hashedPassword := password
+		Role := 1
 
 		// Println(hashedPassword)
 		if len(hashedPassword) != 0 && checkErr(w, r, err) {
-			stmt, err := db.Prepare("INSERT INTO pet_owner (Email, Name, Password) VALUES (?,?,?)")
+			stmt, err := db.Prepare("INSERT INTO account (Email, Name, Password, Role) VALUES (?,?,?,?)")
 			if err == nil {
-				_, err := stmt.Exec(&email, &name, &hashedPassword)
+				_, err := stmt.Exec(&email, &name, &hashedPassword, &Role)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
@@ -228,7 +236,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 				response.Status = true
 				response.Message = message
 				json.NewEncoder(w).Encode(response)
-				http.Redirect(w, r, "/login", 201)
 				return
 			}
 		} else {
@@ -239,7 +246,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			response.Message = message
 			json.NewEncoder(w).Encode(response)
 
-			http.Redirect(w, r, "/register", 302)
 		}
 	}
 }

@@ -22,14 +22,14 @@ func init() {
 }
 
 // AuthenticateUser : ngecek apakah user tersebut terdaftar
-func AuthenticateUser(email, password string) (bool, models.Pet_Owner) {
+func AuthenticateUser(email, password string) (bool, models.Account) {
 	//cari document dengan username dan password yg diberikan
 
-	var user models.Pet_Owner
-	sqlStatement := "SELECT id,Email,Name,Password FROM pet_owner WHERE Email=?"
+	var user models.Account
+	sqlStatement := "SELECT email,name,password,role FROM account WHERE email=?"
 
 	err = db.QueryRow(sqlStatement, email).
-		Scan(&user.ID, &user.Email, &user.Name, &user.Password)
+		Scan(&user.Email, &user.Name, &user.Password, &user.Role)
 	if err == sql.ErrNoRows {
 		return false, user
 	}
@@ -39,10 +39,10 @@ func AuthenticateUser(email, password string) (bool, models.Pet_Owner) {
 	// if check_match != nil {
 	if password != user.Password {
 		//LOGIN FAILED, PASSWORD SALAH
-		log.Println("Password Salah")
+		log.Println("Password atau email salah")
 		return false, user
 	}
 	//LOGIN SUCCESS
-	log.Println("Password Benar")
+	log.Println("Password atau email salah")
 	return true, user
 }

@@ -24,23 +24,24 @@ func handleRequest() {
 
 	// ACCOUNT
 	account := router.PathPrefix("/account").Subrouter()
-	account.HandleFunc("/register", handler.Register).Methods("POST")
-	account.HandleFunc("/login", handler.Login).Methods("POST")
-	account.HandleFunc("/logout", handler.Logout)
+	account.HandleFunc("/register", handler.Register).Methods("POST") //account/register
+	account.HandleFunc("/login", handler.Login).Methods("POST")       //account/login
+	account.HandleFunc("/logout", handler.Logout)                     //account/logout
 
 	// APPOINTMENT
 	appointment := router.PathPrefix("/appointment").Subrouter()
-	appointment.Use(mid.JWTAuthorization)
-	appointment.HandleFunc("", handler.CreateAppointment).Methods("POST")
-	appointment.HandleFunc("/{id}/uploadPayment", handler.UploadPayment).Methods("POST")
-	// appointment.HandleFunc("", handler.GetAllAppointments).Methods("GET")
-	appointment.HandleFunc("/{id}", handler.GetAppointmentByID).Methods("GET")
-	appointment.HandleFunc("/{id}", handler.DeleteAppointment).Methods("DELETE")
-	appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")
+	appointment.Use(mid.JWTAuthorization, mid.PetOwner)
+	//kalo mau apply lebih dari satu middleware tambahin aja di dalam kurung
+	appointment.HandleFunc("", handler.CreateAppointment).Methods("POST")                //appointment
+	appointment.HandleFunc("/{id}/uploadPayment", handler.UploadPayment).Methods("POST") //appointment/{id}/uploadPayment
+	// appointment.HandleFunc("", handler.GetAllAppointments).Methods("GET")				//appointment
+	appointment.HandleFunc("/{id}", handler.GetAppointmentByID).Methods("GET")   //appointment/{id}
+	appointment.HandleFunc("/{id}", handler.DeleteAppointment).Methods("DELETE") //appointment/{id}
+	appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")    //appointment/{id}
 
 	// FORUM
-	// appointment := router.PathPrefix("/forum").Subrouter()
-	// appointment.Use(mid.MiddlewareJWTAuthorization)
+	// forum := router.PathPrefix("/forum").Subrouter()
+	// forum.Use(mid.JWTAuthorization, mid.PetOwner)
 	// appointment.HandleFunc("", handler.CreateTopic).Methods("POST")
 	// appointment.HandleFunc("{topicid}/reply", handler.ReplyTopic).Methods("POST")
 

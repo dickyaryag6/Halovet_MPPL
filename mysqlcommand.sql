@@ -1,5 +1,5 @@
-CREATE TABLE `appointment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `appointment` 
+( `id` int(11) NOT NULL AUTO_INCREMENT,
   `appointment_time` timestamp NOT NULL,
   `doctor_name` varchar(45) NOT NULL,
   `pet_owner_name` varchar(45) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE `appointment` (
   UNIQUE KEY `id_UNIQUE` (`id`)
 );
 
-CREATE TABLE `pet_owner` (
+CREATE TABLE IF NOT EXISTS `pet_owner` (
   `name` varchar(16) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,

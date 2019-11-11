@@ -6,5 +6,5 @@ import (
 
 type TheClaims struct {
     jwt.StandardClaims
-    User Pet_Owner
+    User Account
 }
