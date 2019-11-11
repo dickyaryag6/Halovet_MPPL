@@ -55,8 +55,8 @@ func checkErr(w http.ResponseWriter, r *http.Request, err error) bool {
 func QueryUser(email string) (bool, models.Pet_Owner) {
 
 	var user models.Pet_Owner
-
-	sqlStatement := "SELECT id,email,name,password FROM pet_owner WHERE mail=?"
+	// Println(email)
+	sqlStatement := "SELECT id,email,name,password FROM pet_owner WHERE email=?"
 	err = db.QueryRow(sqlStatement, email).
 		Scan(&user.ID, &user.Email, &user.Name, &user.Password)
 	if err == sql.ErrNoRows {
@@ -199,6 +199,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Println(message)
 	}
 	name := r.FormValue("name")
+
 	//cek apakah email user sudah ada di database
 	//query user dengan email tersebut
 	status, _ := QueryUser(email)
