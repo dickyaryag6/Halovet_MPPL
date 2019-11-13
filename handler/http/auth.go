@@ -66,6 +66,24 @@ func QueryUser(email string) (bool, models.Account) {
 
 }
 
+// ValidateEmail : ngecek apakah format email benar
+func ValidateEmail(email string) (string, bool) {
+	if !strings.Contains(email, "@") || email == "" {
+		return "Email address is required", false
+	}
+	message := "Email Valid"
+	return message, true
+}
+
+// ValidatePassword : ngecek apakah password sesuai
+func ValidatePassword(password string) (string, bool) {
+	if len(password) < 6 {
+		return "Password should be more than 6 character", false
+	}
+	message := "Password Valid"
+	return message, true
+}
+
 // Login : fungsi Login
 func Login(w http.ResponseWriter, r *http.Request) {
 
@@ -84,13 +102,32 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwtSignKey := "notsosecret"
 	appName := "Halovet"
 	var message string
-	// email := r.FormValue("email")
-	// password := r.FormValue("password")
 
-	//dapetin informasi dari form login
-	email, password, ok := r.BasicAuth()
-	if !ok {
-		message = "Invalid email or password"
+	//dapetin informasi dari Basic Auth
+	// email, password, ok := r.BasicAuth()
+	// if !ok {
+	// 	message = "Invalid email or password"
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.WriteHeader(200)
+	// 	response.Status = false
+	// 	response.Message = message
+	// 	json.NewEncoder(w).Encode(response)
+	// 	return
+	// }
+	//dapetin informasi dari form
+	email := r.FormValue("email")
+	if _, status := ValidateEmail(email); status != true {
+		message := "Format Email Salah atau Kosong"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		response.Status = false
+		response.Message = message
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	password := r.FormValue("password")
+	if _, status := ValidatePassword(password); status != true {
+		message := "Format Password Salah atau Kosong, Minimal 6 Karakter"
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		response.Status = false
@@ -150,24 +187,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Value:   signedToken,
 		Expires: time.Now().Add(LoginExpDuration),
 	})
-}
-
-// ValidateEmail : ngecek apakah format email benar
-func ValidateEmail(email string) (string, bool) {
-	if !strings.Contains(email, "@") || email == "" {
-		return "Email address is required", false
-	}
-	message := "Email Valid"
-	return message, true
-}
-
-// ValidatePassword : ngecek apakah password sesuai
-func ValidatePassword(password string) (string, bool) {
-	if len(password) < 6 {
-		return "Password should be more than 6 character", false
-	}
-	message := "Password Valid"
-	return message, true
 }
 
 // Register : fungsi register
