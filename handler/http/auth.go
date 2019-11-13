@@ -154,7 +154,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // ValidateEmail : ngecek apakah format email benar
 func ValidateEmail(email string) (string, bool) {
-	if !strings.Contains(email, "@") {
+	if !strings.Contains(email, "@") || email == "" {
 		return "Email address is required", false
 	}
 	message := "Email Valid"
@@ -191,12 +191,24 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	//BIKIN VALIDATION
 
 	email := r.FormValue("email")
-	if message, status := ValidateEmail(email); status != true {
-		Println(message)
+	if _, status := ValidateEmail(email); status != true {
+		message := "Format Email Salah atau Kosong"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		response.Status = false
+		response.Message = message
+		json.NewEncoder(w).Encode(response)
+		return
 	}
 	password := r.FormValue("password")
-	if message, status := ValidatePassword(password); status != true {
-		Println(message)
+	if _, status := ValidatePassword(password); status != true {
+		message := "Format Password Salah atau Kosong, Minimal 6 Karakter"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		response.Status = false
+		response.Message = message
+		json.NewEncoder(w).Encode(response)
+		return
 	}
 	name := r.FormValue("name")
 
@@ -211,7 +223,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		message := "Email sudah terdaftar"
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
-		response.Status = true
+		response.Status = false
 		response.Message = message
 		json.NewEncoder(w).Encode(response)
 		return
@@ -242,7 +254,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			message := "Registration Failed"
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(200)
-			response.Status = true
+			response.Status = false
 			response.Message = message
 			json.NewEncoder(w).Encode(response)
 
