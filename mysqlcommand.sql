@@ -1,10 +1,10 @@
 CREATE TABLE `account` (
-  `name` varchar(16) NOT NULL,
+  `name` varchar(30) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `role` int(11) NOT NULL,
+  `role` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
 ) 
