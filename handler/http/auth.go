@@ -93,7 +93,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		message = "Invalid email or password"
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
-		response.Status = true
+		response.Status = false
 		response.Message = message
 		json.NewEncoder(w).Encode(response)
 		return
@@ -104,7 +104,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		message = "Invalid email or password"
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
-		response.Status = true
+		response.Status = false
 		response.Message = message
 		json.NewEncoder(w).Encode(response)
 		return
