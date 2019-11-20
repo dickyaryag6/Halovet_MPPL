@@ -3,8 +3,8 @@ package repository
 import (
 	dbCon "Halovet/driver"
 	models "Halovet/models"
+	"time"
 
-	// "time"
 	"database/sql"
 	. "fmt"
 	"log"
@@ -22,11 +22,11 @@ func init() {
 	}
 }
 
-func Insert(time string, doctor_name string, pet_owner_name string, pet_name string, complaint string) (models.Appointment, bool) {
+func Insert(time_appointment string, doctor_name string, pet_owner_name string, pet_owner_id int, pet_type string, complaint string) (models.Appointment, bool) {
 	var appointment models.Appointment
 
-	sql_statement := "insert into appointment (appointment_time,doctor_name, pet_owner_name, pet_type, complaint_description) values (?,?,?,?,?)"
-	row, err := db.Exec(sql_statement, time, doctor_name, pet_owner_name, pet_name, complaint)
+	sql_statement := "insert into appointment (appointment_time,doctor_name, pet_owner_name, pet_owner_id, pet_type, complaint_description) values (?,?,?,?,?,?)"
+	row, err := db.Exec(sql_statement, time_appointment, doctor_name, pet_owner_name, pet_owner_id, pet_type, complaint)
 
 	if err != nil {
 		Println(err.Error())
@@ -39,10 +39,13 @@ func Insert(time string, doctor_name string, pet_owner_name string, pet_name str
 	}
 	appointment.AppointmentID = id
 	appointment.Doctor_name = doctor_name
-	appointment.Time_Appointment = time
-	appointment.Pet_owner_name = pet_owner_name
-	appointment.Pet_name = pet_name
+	appointment.Time_Appointment = time_appointment
+	appointment.Pet_Owner_Name = pet_owner_name
+	appointment.Pet_owner_id = pet_owner_id
+	appointment.Pet_Type = pet_type
 	appointment.Complaint = complaint
+	appointment.CreatedAt = Sprintf(time.Now().Format("2006-01-02 15:04:05"))
+	appointment.UpdatedAt = Sprintf(time.Now().Format("2006-01-02 15:04:05"))
 
 	return appointment, true
 
@@ -56,24 +59,22 @@ func FindbyID(id string) (models.Appointment, bool) {
 	}
 	sql_statement := "select * from appointment where id = ?"
 	err = db.QueryRow(sql_statement, appointmentid).
-		Scan(&appointment.AppointmentID, &appointment.Time_Appointment, &appointment.Doctor_name, &appointment.Pet_owner_name, &appointment.Pet_name, &appointment.Complaint)
+		Scan(&appointment.AppointmentID,
+			&appointment.Time_Appointment,
+			&appointment.Doctor_name,
+			&appointment.Pet_Owner_Name,
+			&appointment.Pet_Type,
+			&appointment.Complaint,
+			&appointment.IsPaid,
+			&appointment.CreatedAt,
+			&appointment.UpdatedAt,
+			&appointment.Pet_owner_id,
+		)
 
 	if err != nil {
 		Println(err.Error())
 		return appointment, false
 	}
-
-	//  for rows.Next() {
-	//       var each = models.Appointment{}
-	//       var err = rows.Scan(&each.ID, &each.time, &each.doctor_name, &each.pet_owner_name, &each.pet_name, &each.complaint)
-	//
-	//       if err != nil {
-	//           fmt.Println(err.Error())
-	//           return
-	//       }
-	//
-	//       result = append(result, each)
-	// }
 
 	return appointment, true
 }
@@ -81,9 +82,9 @@ func FindbyID(id string) (models.Appointment, bool) {
 // func FindAll()
 
 func Remove(id string) bool {
-	Println(id)
+
 	appointmentid, err := strconv.Atoi(id)
-	Println(appointmentid)
+
 	if err != nil {
 		Println("format ID salah")
 	}
@@ -97,14 +98,15 @@ func Remove(id string) bool {
 	return true
 }
 
-func Update(id string, doctor_name string, pet_name string, complaint string, time string) bool {
+func Update(id string, doctor_name string, pet_type string, complaint string, appointment_time string) bool {
 	// var appointment models.Appointment
 	appointmentid, err := strconv.Atoi(id)
 	if err != nil {
 		Println("format ID salah")
 	}
-	sql_statement := "update appointment set doctor_name = ?, pet_type = ?, complaint_description = ?, appointment_time = ? where id = ?"
-	_, err = db.Exec(sql_statement, doctor_name, pet_name, complaint, time, appointmentid)
+	timeNow := Sprintf(time.Now().Format("2006-01-02 15:04:05"))
+	sql_statement := "update appointment set doctor_name = ?, pet_type = ?, complaint_description = ?, appointment_time = ?, updated_at = ? where id = ?"
+	_, err = db.Exec(sql_statement, doctor_name, pet_type, complaint, appointment_time, timeNow, appointmentid)
 
 	if err != nil {
 		Println(err.Error())

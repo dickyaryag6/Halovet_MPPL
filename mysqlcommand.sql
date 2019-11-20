@@ -1,5 +1,5 @@
 CREATE TABLE `account` (
-  `name` varchar(30) NOT NULL,
+  `name` varchar(16) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -7,7 +7,7 @@ CREATE TABLE `account` (
   `role` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) 
+)
 
 CREATE TABLE `appointment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -17,8 +17,9 @@ CREATE TABLE `appointment` (
   `pet_type` varchar(45) NOT NULL,
   `complaint_description` varchar(45) DEFAULT NULL,
   `is_paid` tinyint(4) DEFAULT '0',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `pet_owner_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) 
@@ -29,26 +30,29 @@ CREATE TABLE `forum_category` (
   `category_desc` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) 
+)
 
 CREATE TABLE `forum_reply` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `category_id` int(11) DEFAULT NULL,
   `topic_id` int(11) DEFAULT NULL,
   `author` varchar(45) DEFAULT NULL,
+  `author_id` bigint(20) DEFAULT NULL,
   `content` varchar(45) DEFAULT NULL,
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) 
 
 CREATE TABLE `forum_topic` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `category_id` int(11) DEFAULT NULL,
-  `title` varchar(45) DEFAULT NULL,
-  `author` varchar(45) DEFAULT NULL,
-  `content` varchar(45) DEFAULT NULL,
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `category_id` int(11) NOT NULL,
+  `title` varchar(45) NOT NULL,
+  `author` varchar(45) NOT NULL,
+  `content` varchar(45) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `author_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-)
+) 

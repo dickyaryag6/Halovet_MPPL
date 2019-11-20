@@ -1,20 +1,21 @@
 package models
 
-import (
-	"time"
-)
-
 type Appointment struct {
 	AppointmentID int64
 	// Time_Posted         time.Time
 	Time_Appointment string
 	Doctor_name      string
-	Pet_owner_name   string
-	Pet_name         string
+	Pet_Owner_Name   string
+	Pet_owner_id     int
+	Pet_Type         string
+	IsPaid           bool
 	Complaint        string
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 type Account struct {
+	ID       int
 	Email    string
 	Name     string
 	Password string
@@ -38,29 +39,46 @@ type Docter struct {
 	Password string
 }
 
-type Forum_Category struct {
-	ID             int
-	Category_title string
-	Category_Desc  string
+type ForumCategory struct {
+	ID            int
+	CategoryTitle string
+	CategoryDesc  string
 }
 
-type Forum_Topic struct {
-	ID          int
-	Category    Forum_Category //apa category dari forum ini
-	Title       string         //judul dari topic ini
-	Author      Pet_Owner      //yang ngepost topic
-	Content     string         //pertanyaan topic
-	Time_Posted time.Time
+type ForumTopic struct {
+	TopicID   int64
+	Category  ForumCategory //apa category dari forum ini
+	Title     string        //judul dari topic ini
+	Author    string        //yang ngepost topic
+	AuthorID  int
+	Content   string //pertanyaan topic
+	CreatedAt string
+	UpdatedAt string
 	// views       int
+	Replies []ForumReply
 }
 
-type Forum_Reply struct {
-	ID          int
-	Category    Forum_Category //apa category dari forum ini
-	forum_topic Forum_Topic    //apa topic dari forum ini
-	Author      string         //yang ngepost reply
-	Comment     string         //isi dari reply
-	Time_Posted time.Time      //kapan post reply
+type ForumReply struct {
+	ReplyID int64
+	// CategoryID  	int //apa category dari forum ini
+	TopicID   int    //apa topic dari forum ini
+	Author    string //yang ngepost reply
+	AuthorID  int
+	Content   string //isi dari reply
+	CreatedAt string //kapan post reply
+	UpdatedAt string
+}
+
+type ForumTopicResponse struct {
+	Status  bool
+	Message string
+	Data    map[string]interface{}
+}
+
+type Response struct {
+	Status  bool
+	Message string
+	Data    map[string]interface{}
 }
 
 type AppointmentResponse struct {

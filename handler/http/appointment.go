@@ -42,7 +42,6 @@ func GetAppointmentByID(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		response.Status = false
 		response.Message = message
-		// response.Data = result
 		json.NewEncoder(w).Encode(response)
 	} else {
 		result = append(result, realResult)
@@ -68,6 +67,8 @@ func GetAppointmentByID(w http.ResponseWriter, r *http.Request) {
 // CreateAppointment : fungsi createappointment
 func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 
+	//INSERT
+
 	Println("Endpoint Hit: createAppointment")
 	// reqBody, _ := ioutil.ReadAll(r.Body)
 	var appointment models.Appointment
@@ -75,26 +76,26 @@ func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 	var response models.AppointmentResponse
 	// json.Unmarshal(reqBody, &appointment)
 	appointment.Doctor_name = r.FormValue("doctor_name")
-	appointment.Pet_name = r.FormValue("pet_name")
+	appointment.Pet_Type = r.FormValue("pet_type")
 	appointment.Complaint = r.FormValue("complaint")
 	appointment.Time_Appointment = r.FormValue("time")
-
-	//ISI FORM CUMA doctor_name,pet_name,complaint, sama time_appointment
-	// currentTime := time.Now()
-	// appointment.Time_Appointment = currentTime.Format("2006-01-02 15:04:05")
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	user := userInfo["User"]
 	userReal, _ := user.(map[string]interface{})
-	appointment.Pet_owner_name = Sprintf("%v", userReal["Name"])
-
-	//INSERT OBJEK KE DB
+	appointment.Pet_Owner_Name = Sprintf("%v", userReal["Name"])
+	appointment.Pet_owner_id, err = strconv.Atoi(Sprintf("%v", userReal["ID"]))
+	if err != nil {
+		Println("format ID salah")
+		// return Topic, false
+	}
 
 	realResult, status := method.Insert(
 		appointment.Time_Appointment,
 		appointment.Doctor_name,
-		appointment.Pet_owner_name,
-		appointment.Pet_name,
+		appointment.Pet_Owner_Name,
+		appointment.Pet_owner_id,
+		appointment.Pet_Type,
 		appointment.Complaint,
 	)
 
@@ -124,7 +125,7 @@ func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 		response.Data = data
 		json.NewEncoder(w).Encode(response)
 
-		s := Sprintf("%s Succesfully Created New Appointment", appointment.Pet_owner_name)
+		s := Sprintf("%s Succesfully Created New Appointment", appointment.Pet_Owner_Name)
 		log.Println(s)
 	}
 
@@ -166,15 +167,15 @@ func UpdateAppointment(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r) //ambil isi dari w,isinya parameter dari endpoint
 
 	var appointment models.Appointment
-	var response models.AppointmentResponse
+	var response models.Response
 	// json.Unmarshal(reqBody, &appointment)
 	appointment.Doctor_name = r.FormValue("doctor_name")
-	appointment.Pet_name = r.FormValue("pet_name")
+	appointment.Pet_Type = r.FormValue("pet_type")
 	appointment.Complaint = r.FormValue("complaint")
 	appointment.Time_Appointment = r.FormValue("time")
 	// vars := mux.Vars(r) //ambil isi dari w,isinya parameter dari endpoint
 	// id := "art"+vars["id"] //ambil id dari endpoint
-	//
+
 	// reqBody, _ := ioutil.ReadAll(r.Body)
 	// var appointment models.Appointment
 	// json.Unmarshal(reqBody, &appointment)
@@ -184,7 +185,7 @@ func UpdateAppointment(w http.ResponseWriter, r *http.Request) {
 		// appointment.Time_Appointment,
 		appointment.Doctor_name,
 		// appointment.Pet_owner_name,
-		appointment.Pet_name,
+		appointment.Pet_Type,
 		appointment.Complaint,
 		appointment.Time_Appointment)
 
@@ -239,13 +240,13 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 	//NGAMBIL DATA PET OWNER, APPOINTMENT TIME, DAN NAMA DOKTER
 	sqlStatement := "select pet_owner_name, appointment_time, doctor_name from appointment where id = ?"
 	err = db.QueryRow(sqlStatement, appointmentid).
-		Scan(&appointment.Pet_owner_name, &appointment.Time_Appointment, &appointment.Doctor_name)
+		Scan(&appointment.Pet_Owner_Name, &appointment.Time_Appointment, &appointment.Doctor_name)
 	if err != nil {
 		Println(err.Error())
 	}
-	Println(appointment.Pet_owner_name, appointment.Time_Appointment[0:10], appointment.Doctor_name)
+	Println(appointment.Pet_Owner_Name, appointment.Time_Appointment[0:10], appointment.Doctor_name)
 	filename := fmt.Sprintf("%s-%s-%s%s",
-		appointment.Pet_owner_name,
+		appointment.Pet_Owner_Name,
 		appointment.Time_Appointment[0:10],
 		appointment.Doctor_name,
 		filepath.Ext(handler.Filename))
@@ -266,5 +267,9 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("done"))
+
+}
+
+func ValidatePay(w http.ResponseWriter, r *http.Request) {
 
 }

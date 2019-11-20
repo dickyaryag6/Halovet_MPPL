@@ -26,16 +26,16 @@ func AuthenticateUser(email, password string) (bool, models.Account) {
 	//cari document dengan username dan password yg diberikan
 
 	var user models.Account
-	sqlStatement := "SELECT email,name,password,role FROM account WHERE email=?"
+	sqlStatement := "SELECT id,email,name,password,role FROM account WHERE email=?"
 
 	err = db.QueryRow(sqlStatement, email).
-		Scan(&user.Email, &user.Name, &user.Password, &user.Role)
+		Scan(&user.ID, &user.Email, &user.Name, &user.Password, &user.Role)
 	if err == sql.ErrNoRows {
 		return false, user
 	}
 
 	// check_match := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	log.Println(user.Password)
+	// log.Println(user.Password)
 	// if check_match != nil {
 	if password != user.Password {
 		//LOGIN FAILED, PASSWORD SALAH
@@ -43,6 +43,6 @@ func AuthenticateUser(email, password string) (bool, models.Account) {
 		return false, user
 	}
 	//LOGIN SUCCESS
-	log.Println("Password atau email salah")
+	// log.Println("Password atau email salah")
 	return true, user
 }

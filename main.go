@@ -40,10 +40,30 @@ func handleRequest() {
 	appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")    //appointment/{id}
 
 	// FORUM
-	// forum := router.PathPrefix("/forum").Subrouter()
-	// forum.Use(mid.JWTAuthorization, mid.PetOwner)
-	// appointment.HandleFunc("", handler.CreateTopic).Methods("POST")
-	// appointment.HandleFunc("{topicid}/reply", handler.ReplyTopic).Methods("POST")
+	forum := router.PathPrefix("/forum").Subrouter()
+	forum.Use(mid.JWTAuthorization)
+	// create topic forum
+	forum.HandleFunc("", handler.CreateTopic).Methods("POST") //forum
+	// get suatu topic forum
+	forum.HandleFunc("/{topicid}", handler.GetTopic).Methods("GET") //forum/topicid
+	// edit pertanyaan topic forum
+	forum.HandleFunc("/{topicid}", handler.UpdateTopic).Methods("PUT") //forum/topicid
+	// delete pertanyaan topic forum
+	forum.HandleFunc("/{topicid}", handler.DeleteTopic).Methods("DELETE") //forum/topicid
+	// reply suatu topic
+	forum.HandleFunc("/{topicid}/reply", handler.ReplyTopic).Methods("POST") //forum/topicid/reply
+	// hapus sebuah reply
+	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.DeleteReply).Methods("DELETE")
+	// update sebuah reply
+	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.UpdateReply).Methods("PUT")
+	// get sebuah reply
+	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.GetReply).Methods("GET")
+	// list semua topic yg ditanyakan user
+	// forum.HandleFunc("/{userid}", handler.ListTopicByUserID).Methods("GET") //forum/userid
+	// list semua topic dengan kategori tertentu
+	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
+
+	// ARTICLE
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
