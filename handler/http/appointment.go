@@ -22,14 +22,47 @@ import (
 )
 
 //YANG DIKEMBALIKAN CUMA APPOINTMENT DENGAN USER ID TERTENTU
-// func GetAppointmentByUserID(w http.ResponseWriter, r *http.Request) {
-//
-// }
+func GetAllAppointment(w http.ResponseWriter, r *http.Request) {
+	Println("GET params were:", r.URL.Query())
+
+	var response models.Response
+	// var result []models.Appointment
+
+	querymap := r.URL.Query()
+	limitstart := querymap["limitstart"][0]
+	// Printf("%T\n", limitstart)
+	limit := querymap["limit"][0]
+	// Println(limit)
+
+	realResult, err := method.FindAllAppointment(limitstart, limit)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		response.Status = false
+		response.Message = "Failed to Get Appointment"
+		json.NewEncoder(w).Encode(response)
+	} else {
+		// result = append(result, realResult)
+
+		data := map[string]interface{}{
+			"Appointments": realResult,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		message := "Appointments Get Succesfully"
+		w.WriteHeader(202)
+		response.Status = true
+		response.Message = message
+		response.Data = data
+		json.NewEncoder(w).Encode(response)
+	}
+}
 
 // GetAppointmentByID : nyari appointment dengan id tertentu
 func GetAppointmentByID(w http.ResponseWriter, r *http.Request) {
 	Println("Endpoint Hit: GetAppointmentByID")
-	var response models.AppointmentResponse
+	var response models.Response
 	var result []models.Appointment
 
 	vars := mux.Vars(r)
@@ -73,7 +106,7 @@ func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 	// reqBody, _ := ioutil.ReadAll(r.Body)
 	var appointment models.Appointment
 	var result []models.Appointment
-	var response models.AppointmentResponse
+	var response models.Response
 	// json.Unmarshal(reqBody, &appointment)
 	appointment.Doctor_name = r.FormValue("doctor_name")
 	appointment.Pet_Type = r.FormValue("pet_type")

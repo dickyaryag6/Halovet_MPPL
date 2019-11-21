@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	. "fmt"
 	"net/http"
 	"strconv"
@@ -85,6 +84,17 @@ func JWTAuthorization(next http.Handler) http.Handler {
 	})
 }
 
+// type middleware func(http.HandlerFunc) http.HandlerFunc
+
+// func buildChain(f http.HandlerFunc, m ...middleware) http.HandlerFunc {
+// 	// if our chain is done, use the original handlerfunc
+// 	if len(m) == 0 {
+// 		return f
+// 	}
+// 	// otherwise nest the handlerfuncs
+// 	return m[0](buildChain(f, m[1:cap(m)]...))
+// }
+
 // PetOwner : Middleware PetOwner
 func PetOwner(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +105,7 @@ func PetOwner(next http.Handler) http.Handler {
 		userReal, _ := user.(map[string]interface{})
 		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
 		if err == nil {
-			fmt.Println(Role)
+			Println(Role)
 		}
 		if Role != 1 {
 			w.Write([]byte("Pet Owner is not allowed to do this method"))
@@ -114,10 +124,29 @@ func Doctor(next http.Handler) http.Handler {
 		userReal, _ := user.(map[string]interface{})
 		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
 		if err == nil {
-			fmt.Println(Role)
+			Println(Role)
 		}
 		if Role != 2 {
 			w.Write([]byte("Doctor is not allowed to do this method"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func Admin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//CEK APAKAH PET OWNER APA BUKAN
+
+		userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
+		user := userInfo["User"]
+		userReal, _ := user.(map[string]interface{})
+		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
+		if err == nil {
+			Println(Role)
+		}
+		if Role != 3 {
+			w.Write([]byte("Only Admin is allowed to do this method"))
 			return
 		}
 		next.ServeHTTP(w, r)

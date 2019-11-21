@@ -14,12 +14,22 @@ type Appointment struct {
 	UpdatedAt        string
 }
 
+type Article struct {
+	ID        int64
+	Title     string
+	Author    string
+	AuthorID  int
+	Content   string
+	CreatedAt string
+	UpdatedAt string
+}
+
 type Account struct {
 	ID       int
 	Email    string
 	Name     string
 	Password string
-	Role     int //1:PetOwner, 2:Doctor
+	Role     int //1:PetOwner, 2:Doctor, 3:Admin
 }
 
 type Pet_Owner struct {

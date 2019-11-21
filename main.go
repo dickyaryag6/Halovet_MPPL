@@ -41,7 +41,7 @@ func handleRequest() {
 
 	// FORUM
 	forum := router.PathPrefix("/forum").Subrouter()
-	forum.Use(mid.JWTAuthorization)
+	forum.Use(mid.JWTAuthorization, mid.PetOwner)
 	// create topic forum
 	forum.HandleFunc("", handler.CreateTopic).Methods("POST") //forum
 	// get suatu topic forum
@@ -50,20 +50,36 @@ func handleRequest() {
 	forum.HandleFunc("/{topicid}", handler.UpdateTopic).Methods("PUT") //forum/topicid
 	// delete pertanyaan topic forum
 	forum.HandleFunc("/{topicid}", handler.DeleteTopic).Methods("DELETE") //forum/topicid
+
+	reply := router.PathPrefix("/forum").Subrouter()
+	reply.Use(mid.JWTAuthorization)
 	// reply suatu topic
-	forum.HandleFunc("/{topicid}/reply", handler.ReplyTopic).Methods("POST") //forum/topicid/reply
+	reply.HandleFunc("/{topicid}/reply", handler.ReplyTopic).Methods("POST") //forum/topicid/reply
 	// hapus sebuah reply
-	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.DeleteReply).Methods("DELETE")
+	reply.HandleFunc("/{topicid}/reply/{replyid}", handler.DeleteReply).Methods("DELETE")
 	// update sebuah reply
-	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.UpdateReply).Methods("PUT")
+	reply.HandleFunc("/{topicid}/reply/{replyid}", handler.UpdateReply).Methods("PUT")
 	// get sebuah reply
-	forum.HandleFunc("/{topicid}/reply/{replyid}", handler.GetReply).Methods("GET")
+	reply.HandleFunc("/{topicid}/reply/{replyid}", handler.GetReply).Methods("GET")
 	// list semua topic yg ditanyakan user
 	// forum.HandleFunc("/{userid}", handler.ListTopicByUserID).Methods("GET") //forum/userid
 	// list semua topic dengan kategori tertentu
 	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
 
 	// ARTICLE
+	article := router.PathPrefix("/admin/article").Subrouter()
+	article.Use(mid.JWTAuthorization, mid.Admin)
+	article.HandleFunc("", handler.CreateArticle).Methods("POST")
+	article.HandleFunc("/{articleid}", handler.GetArticle).Methods("GET")
+	article.HandleFunc("/{articleid}", handler.UpdateArticle).Methods("PUT")
+	article.HandleFunc("/{articleid}", handler.DeleteArticle).Methods("DELETE")
+
+	//KHUSUS ADMIN
+	adminappointment := router.PathPrefix("/admin/appointment").Subrouter()
+	adminappointment.Use(mid.JWTAuthorization, mid.Admin)
+	adminappointment.HandleFunc("", handler.GetAllAppointment).Methods("GET")
+
+	//PENCARIAN
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

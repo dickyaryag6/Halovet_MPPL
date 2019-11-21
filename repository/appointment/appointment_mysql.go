@@ -51,6 +51,49 @@ func Insert(time_appointment string, doctor_name string, pet_owner_name string, 
 
 }
 
+func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, error) {
+	var Appointment models.Appointment
+	var Appointments []models.Appointment
+
+	realLimitStart, err := strconv.Atoi(limitstart)
+	if err != nil {
+		Println("format limit salah")
+		return Appointments, err
+	}
+	realLimit, err := strconv.Atoi(limit)
+	if err != nil {
+		Println("format limit salah")
+		return Appointments, err
+	}
+
+	sqlStatement := "select * from appointment order by created_at limit ?, ?"
+	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
+	if err != nil {
+		panic(err.Error())
+		return Appointments, err
+	}
+	for results.Next() {
+		err = results.Scan(&Appointment.AppointmentID,
+			&Appointment.Time_Appointment,
+			&Appointment.Doctor_name,
+			&Appointment.Pet_Owner_Name,
+			&Appointment.Pet_Type,
+			&Appointment.Complaint,
+			&Appointment.IsPaid,
+			&Appointment.CreatedAt,
+			&Appointment.UpdatedAt,
+			&Appointment.Pet_owner_id)
+		if err != nil {
+			panic(err.Error())
+		} else {
+			Appointments = append(Appointments, Appointment)
+		}
+
+	}
+
+	return Appointments, nil
+}
+
 func FindbyID(id string) (models.Appointment, bool) {
 	var appointment models.Appointment
 	appointmentid, err := strconv.Atoi(id)
