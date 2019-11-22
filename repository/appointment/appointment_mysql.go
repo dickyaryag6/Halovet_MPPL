@@ -130,6 +130,7 @@ func Remove(id string) bool {
 
 	if err != nil {
 		Println("format ID salah")
+		return false
 	}
 	sql_statement := "delete from appointment where id = ?"
 	_, err = db.Exec(sql_statement, appointmentid)

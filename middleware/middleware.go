@@ -108,7 +108,7 @@ func PetOwner(next http.Handler) http.Handler {
 			Println(Role)
 		}
 		if Role != 1 {
-			w.Write([]byte("Pet Owner is not allowed to do this method"))
+			w.Write([]byte("Only Pet Owner is allowed to do this method"))
 			return
 		}
 		next.ServeHTTP(w, r)

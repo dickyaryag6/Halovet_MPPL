@@ -130,14 +130,24 @@ func UpdateTopic(id string, title string, content string, categoryid int) bool {
 	timeNow := Sprintf(time.Now().Format("2006-01-02 15:04:05"))
 
 	sqlStatement := "update forum_topic set title = ?, content = ?, category_id = ?, updated_at = ? where id = ?"
-	_, err = db.Exec(sqlStatement, title, content, categoryid, timeNow, appointmentid)
+	row, err := db.Exec(sqlStatement, title, content, categoryid, timeNow, appointmentid)
 
 	if err != nil {
 		Println(err.Error())
 		return false
+	} else {
+		count, err := row.RowsAffected()
+		if err != nil {
+			Println(err.Error())
+			return false
+		}
+		if count != 0 {
+			return true
+		} else {
+			return false
+		}
 	}
 
-	return true
 }
 
 func DeleteTopic(id string) bool {
@@ -235,6 +245,7 @@ func InsertReply(id string, author string, authorid int, content string) (models
 
 	realtopicid, err := strconv.Atoi(id)
 
+	// if len(content)
 	if err != nil {
 		Println("format ID salah")
 		return Reply, errors.New("Insert Reply Gagal")

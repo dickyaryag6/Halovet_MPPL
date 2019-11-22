@@ -20,6 +20,10 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 
 	article.Title = r.FormValue("Title")
 	article.Content = r.FormValue("Content")
+	if len(article.Title) == 0 || len(article.Content) == 0 {
+		json.NewEncoder(w).Encode("Title atau Content tidak boleh Kosong")
+		return
+	}
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	user := userInfo["User"]

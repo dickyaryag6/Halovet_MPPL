@@ -25,6 +25,10 @@ func CreateTopic(w http.ResponseWriter, r *http.Request) {
 
 	Topic.Title = r.FormValue("Title")
 	Topic.Content = r.FormValue("Content")
+	if len(Topic.Title) == 0 || len(Topic.Content) == 0 {
+		json.NewEncoder(w).Encode("Content atau Title tidak boleh kosong")
+		return
+	}
 
 	//get id dari database
 	CategoryID, _ := method.GetCategoryID(r.FormValue("Category"))
@@ -186,6 +190,10 @@ func ReplyTopic(w http.ResponseWriter, r *http.Request) {
 	Reply.AuthorID, _ = strconv.Atoi(Sprintf("%v", userReal["ID"]))
 
 	Reply.Content = r.FormValue("Content")
+	if len(Reply.Content) == 0 {
+		json.NewEncoder(w).Encode("Content tidak boleh kosong")
+		return
+	}
 
 	realResult, err := method.InsertReply(
 		vars["topicid"],
