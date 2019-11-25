@@ -74,32 +74,33 @@ func FindArticle(articleid string) (models.Article, error) {
 	return Article, nil
 }
 
-func UpdateArticle(articleid string, title string, content string) error {
+func UpdateArticle(articleid string, title string, content string) bool {
 	id, err := strconv.Atoi(articleid)
 	if err != nil {
 		Println("format ID salah")
-		return err
+		return false
 	}
-	timeNow := Sprintf(time.Now().Format("2006-01-02 15:04:05"))
-	sqlStatement := "update articles set title = ?, content = ?, updated_at = ? where id = ?"
-	row, err := db.Exec(sqlStatement, title, content, timeNow, id)
 
-	if err != nil {
-		Println(err.Error())
-		return err
+	sqlfind := "select count(*) from articles where id = ?"
+	var i int
+	err = db.QueryRow(sqlfind, id).
+		Scan(&i)
+	// Println(i)
+	if i == 0 {
+		// Println(err.Error())
+		return false
 	} else {
-		count, err := row.RowsAffected()
+		Println("ha")
+		timeNow := Sprintf(time.Now().Format("2006-01-02 15:04:05"))
+		sqlStatement := "update articles set title = ?, content = ?, updated_at = ? where id = ?"
+		_, err := db.Exec(sqlStatement, title, content, timeNow, id)
 		if err != nil {
 			Println(err.Error())
-			return err
+			return false
 		}
-		if count != 0 {
-			return nil
-		} else {
-			return err
-		}
+		return true
 	}
-	return nil
+
 }
 
 func DeleteArticle(articleid string) error {

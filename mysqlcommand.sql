@@ -7,7 +7,7 @@ CREATE TABLE `account` (
   `role` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-)
+);
 
 CREATE TABLE `appointment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -22,7 +22,18 @@ CREATE TABLE `appointment` (
   `pet_owner_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) 
+);
+
+CREATE TABLE `articles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) NOT NULL,
+  `author` varchar(45) NOT NULL,
+  `author_id` bigint(20) NOT NULL,
+  `content` varchar(200) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
 
 CREATE TABLE `forum_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -30,7 +41,7 @@ CREATE TABLE `forum_category` (
   `category_desc` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-)
+);
 
 CREATE TABLE `forum_reply` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -42,17 +53,27 @@ CREATE TABLE `forum_reply` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) 
+);
 
-CREATE TABLE `forum_topic` (
+CREATE TABLE `forum_reply` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `category_id` int(11) NOT NULL,
-  `title` varchar(45) NOT NULL,
-  `author` varchar(45) NOT NULL,
-  `content` varchar(45) NOT NULL,
+  `topic_id` int(11) DEFAULT NULL,
+  `author` varchar(45) DEFAULT NULL,
+  `author_id` bigint(20) DEFAULT NULL,
+  `content` varchar(45) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `author_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) 
+);
+
+INSERT INTO `halovet_db`.`forum_category`
+(`category_title`,`category_desc`)
+VALUES
+('penyakit kulit','pertanyaan tentang penyakit kulit');
+
+
+INSERT INTO `halovet_db`.`forum_category`
+(`category_title`, `category_desc`)
+VALUES
+('penyakit pencernaan','pertanyaan tentang penyakit pencernaan');

@@ -108,10 +108,10 @@ func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 	var result []models.Appointment
 	var response models.Response
 	// json.Unmarshal(reqBody, &appointment)
-	appointment.Doctor_name = r.FormValue("Doctor_name")
-	appointment.Pet_Type = r.FormValue("Pet_type")
-	appointment.Complaint = r.FormValue("Complaint")
-	appointment.Time_Appointment = r.FormValue("Time")
+	appointment.Doctor_name = r.FormValue("doctor_name")
+	appointment.Pet_Type = r.FormValue("pet_type")
+	appointment.Complaint = r.FormValue("complaint")
+	appointment.Time_Appointment = r.FormValue("time")
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	user := userInfo["User"]
@@ -202,10 +202,10 @@ func UpdateAppointment(w http.ResponseWriter, r *http.Request) {
 	var appointment models.Appointment
 	var response models.Response
 	// json.Unmarshal(reqBody, &appointment)
-	appointment.Doctor_name = r.FormValue("Doctor_name")
-	appointment.Pet_Type = r.FormValue("Pet_type")
-	appointment.Complaint = r.FormValue("Complaint")
-	appointment.Time_Appointment = r.FormValue("Time")
+	appointment.Doctor_name = r.FormValue("doctor_name")
+	appointment.Pet_Type = r.FormValue("pet_type")
+	appointment.Complaint = r.FormValue("complaint")
+	appointment.Time_Appointment = r.FormValue("time")
 	// vars := mux.Vars(r) //ambil isi dari w,isinya parameter dari endpoint
 	// id := "art"+vars["id"] //ambil id dari endpoint
 

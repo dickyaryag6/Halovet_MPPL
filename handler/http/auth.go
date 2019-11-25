@@ -115,7 +115,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	//dapetin informasi dari form
-	email := r.FormValue("Email")
+	email := r.FormValue("email")
 	if _, status := ValidateEmail(email); status != true {
 		message := "Format Email Salah atau Kosong"
 		w.Header().Set("Content-Type", "application/json")
@@ -125,7 +125,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	password := r.FormValue("Password")
+	password := r.FormValue("password")
 	if _, status := ValidatePassword(password); status != true {
 		message := "Format Password Salah atau Kosong, Minimal 6 Karakter"
 		w.Header().Set("Content-Type", "application/json")
@@ -209,9 +209,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	//BIKIN VALIDATION
 
-	email := r.FormValue("Email")
-	password := r.FormValue("Password")
-	name := r.FormValue("Name")
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	name := r.FormValue("name")
 
 	if len(name) == 0 {
 		message := "Ada Kolom Yang Kosong"

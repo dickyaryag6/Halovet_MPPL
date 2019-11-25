@@ -18,8 +18,8 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	var result []models.Article
 	var response models.Response
 
-	article.Title = r.FormValue("Title")
-	article.Content = r.FormValue("Content")
+	article.Title = r.FormValue("title")
+	article.Content = r.FormValue("content")
 	if len(article.Title) == 0 || len(article.Content) == 0 {
 		json.NewEncoder(w).Encode("Title atau Content tidak boleh Kosong")
 		return
@@ -85,9 +85,9 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 			"Article": result,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(400)
+		w.WriteHeader(200)
 		response.Status = true
-		response.Message = "Succesfully Create Article"
+		response.Message = "Succesfully Get Article"
 		response.Data = data
 		json.NewEncoder(w).Encode(response)
 
@@ -104,22 +104,23 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 	// var result []models.Article
 	var response models.Response
 
-	article.Title = r.FormValue("Title")
-	article.Content = r.FormValue("Content")
+	article.Title = r.FormValue("title")
+	article.Content = r.FormValue("content")
 
-	err := method.UpdateArticle(
+	result := method.UpdateArticle(
 		vars["articleid"],
 		article.Title,
 		article.Content,
 	)
 
-	if err != nil {
+	if result == false {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
 		response.Status = false
 		response.Message = "Article Failed to Update"
 		json.NewEncoder(w).Encode(response)
 	} else {
+		Println("haha")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(202)
 		response.Status = true

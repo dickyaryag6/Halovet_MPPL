@@ -157,12 +157,6 @@ func Update(id string, doctor_name string, pet_type string, complaint string, ap
 		return false
 	}
 
-	// //ROW AFFECTED
-	// id, err := row.RowsAffected()
-	// if err != nil {
-	//   log.Fatal(err.Error())
-	// }
-
 	return true
 
 }

@@ -23,15 +23,15 @@ func CreateTopic(w http.ResponseWriter, r *http.Request) {
 
 	//AMBIL DATA UNTUK INSERT DATABASE
 
-	Topic.Title = r.FormValue("Title")
-	Topic.Content = r.FormValue("Content")
+	Topic.Title = r.FormValue("title")
+	Topic.Content = r.FormValue("content")
 	if len(Topic.Title) == 0 || len(Topic.Content) == 0 {
 		json.NewEncoder(w).Encode("Content atau Title tidak boleh kosong")
 		return
 	}
 
 	//get id dari database
-	CategoryID, _ := method.GetCategoryID(r.FormValue("Category"))
+	CategoryID, _ := method.GetCategoryID(r.FormValue("category"))
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	user := userInfo["User"]
@@ -115,10 +115,10 @@ func UpdateTopic(w http.ResponseWriter, r *http.Request) {
 	// var result []models.ForumTopic
 	var response models.Response
 
-	Topic.Title = r.FormValue("Title")
-	Topic.Content = r.FormValue("Content")
+	Topic.Title = r.FormValue("title")
+	Topic.Content = r.FormValue("content")
 	//get id dari database
-	CategoryID, _ := method.GetCategoryID(r.FormValue("Category"))
+	CategoryID, _ := method.GetCategoryID(r.FormValue("category"))
 
 	status := method.UpdateTopic(
 		vars["topicid"],
