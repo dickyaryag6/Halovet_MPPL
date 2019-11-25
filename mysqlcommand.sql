@@ -1,5 +1,5 @@
 CREATE TABLE `account` (
-  `name` varchar(16) NOT NULL,
+  `name` varchar(40) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
