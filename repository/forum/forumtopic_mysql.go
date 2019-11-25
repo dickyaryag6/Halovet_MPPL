@@ -23,6 +23,76 @@ func init() {
 }
 
 // CRUD TOPIC FORUM
+
+func FindTopicByUserID(id string) ([]models.ForumTopic, bool) {
+
+	var ForumTopic models.ForumTopic
+	var ForumTopics []models.ForumTopic
+
+	// Println("hit")
+	userid, err := strconv.Atoi(id)
+	// Println(id)
+	if err != nil {
+		Println("format ID salah")
+		return ForumTopics, false
+	}
+
+	sqlStatement := "select * from forum_topic where author_id = ?"
+	results, err := db.Query(sqlStatement, userid)
+	if err != nil {
+		panic(err.Error())
+		return ForumTopics, false
+	}
+
+	var CategoryID int
+	for results.Next() {
+		err = results.Scan(&ForumTopic.TopicID,
+			&CategoryID,
+			&ForumTopic.Title,
+			&ForumTopic.Author,
+			&ForumTopic.Content,
+			&ForumTopic.CreatedAt,
+			&ForumTopic.UpdatedAt,
+			&ForumTopic.AuthorID,
+		)
+		// Println(ForumTopic.TopicID, ForumTopic.Title)
+		if err != nil {
+			panic(err.Error())
+			return ForumTopics, false
+		} else {
+			var Reply models.ForumReply
+			var Replies []models.ForumReply
+
+			sqlStatement = "select * from forum_reply where topic_id = ?"
+			results, err := db.Query(sqlStatement, ForumTopic.TopicID)
+			if err != nil {
+				panic(err.Error()) // proper error handling instead of panic in your app
+				return ForumTopics, false
+			}
+			for results.Next() {
+				err = results.Scan(&Reply.ReplyID,
+					&Reply.TopicID,
+					&Reply.Author,
+					&Reply.AuthorID,
+					&Reply.Content,
+					&Reply.CreatedAt,
+					&Reply.UpdatedAt)
+				if err != nil {
+					panic(err.Error())
+					return ForumTopics, false
+				} else {
+					Replies = append(Replies, Reply)
+				}
+
+			}
+			ForumTopic.Replies = Replies
+			ForumTopic.Category, _ = FindCategory(CategoryID)
+			ForumTopics = append(ForumTopics, ForumTopic)
+		}
+	}
+	return ForumTopics, true
+}
+
 func FindTopicbyID(topicid string) (models.ForumTopic, bool) {
 	//CEK APAKAH ID USER YG LOGIN SAMA DENGAN YANG DI DATABASE
 

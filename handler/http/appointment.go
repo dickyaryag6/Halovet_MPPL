@@ -21,6 +21,42 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func GetAppointmentByUserID(w http.ResponseWriter, r *http.Request) {
+	Println("Endpoint Hit: GetAppointmentByUserID")
+
+	var response models.Response
+	// var result []models.Appointment
+
+	vars := mux.Vars(r)
+
+	realResult, status := method.FindAppointmentbyUserID(vars["userid"])
+
+	if status == false {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		response.Status = false
+		response.Message = "Failed to Get Appointment"
+		json.NewEncoder(w).Encode(response)
+	} else {
+		// result = append(result, realResult)
+		// result = realResult
+
+		data := map[string]interface{}{
+			"Appointments": realResult,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		message := "Appointments Get Succesfully"
+		w.WriteHeader(202)
+		response.Status = true
+		response.Message = message
+		response.Data = data
+		json.NewEncoder(w).Encode(response)
+
+	}
+
+}
+
 //YANG DIKEMBALIKAN CUMA APPOINTMENT DENGAN USER ID TERTENTU
 func GetAllAppointment(w http.ResponseWriter, r *http.Request) {
 	Println("GET params were:", r.URL.Query())

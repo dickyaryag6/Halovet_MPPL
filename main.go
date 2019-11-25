@@ -30,7 +30,7 @@ func handleRequest() {
 
 	// APPOINTMENT
 	appointment := router.PathPrefix("/appointment").Subrouter()
-	appointment.Use(mid.JWTAuthorization, mid.PetOwner)
+	appointment.Use(mid.JWTAuthorization)
 	//kalo mau apply lebih dari satu middleware tambahin aja di dalam kurung
 	appointment.HandleFunc("", handler.CreateAppointment).Methods("POST")                //appointment
 	appointment.HandleFunc("/{id}/uploadPayment", handler.UploadPayment).Methods("POST") //appointment/{id}/uploadPayment
@@ -41,7 +41,7 @@ func handleRequest() {
 
 	// FORUM
 	forum := router.PathPrefix("/forum").Subrouter()
-	forum.Use(mid.JWTAuthorization, mid.PetOwner)
+	forum.Use(mid.JWTAuthorization)
 	// create topic forum
 	forum.HandleFunc("", handler.CreateTopic).Methods("POST") //forum
 	// get suatu topic forum
@@ -66,9 +66,17 @@ func handleRequest() {
 	// list semua topic dengan kategori tertentu
 	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
 
+	//GET BERDASARKAN ID USER
+	user := router.PathPrefix("/{userid}").Subrouter()
+	user.Use(mid.JWTAuthorization)
+	//APPOINTMENT
+	user.HandleFunc("/appointment", handler.GetAppointmentByUserID).Methods("GET")
+	//TOPIC FORUM
+	user.HandleFunc("/topic", handler.GetTopicByUserID).Methods("GET")
+
 	// ARTICLE
 	article := router.PathPrefix("/admin/article").Subrouter()
-	article.Use(mid.JWTAuthorization, mid.Admin)
+	article.Use(mid.JWTAuthorization)
 	article.HandleFunc("", handler.CreateArticle).Methods("POST")
 	article.HandleFunc("/{articleid}", handler.GetArticle).Methods("GET")
 	article.HandleFunc("/{articleid}", handler.UpdateArticle).Methods("PUT")
@@ -76,7 +84,7 @@ func handleRequest() {
 
 	//KHUSUS ADMIN
 	adminappointment := router.PathPrefix("/admin/appointment").Subrouter()
-	adminappointment.Use(mid.JWTAuthorization, mid.Admin)
+	adminappointment.Use(mid.JWTAuthorization)
 	adminappointment.HandleFunc("", handler.GetAllAppointment).Methods("GET")
 
 	//PENCARIAN

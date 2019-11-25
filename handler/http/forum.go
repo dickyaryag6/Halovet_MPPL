@@ -25,12 +25,13 @@ func CreateTopic(w http.ResponseWriter, r *http.Request) {
 
 	Topic.Title = r.FormValue("title")
 	Topic.Content = r.FormValue("content")
-	if len(Topic.Title) == 0 || len(Topic.Content) == 0 {
-		json.NewEncoder(w).Encode("Content atau Title tidak boleh kosong")
+	if len(Topic.Title) == 0 || len(Topic.Content) == 0 || len(r.FormValue("category")) == 0 {
+		json.NewEncoder(w).Encode("Content, Title, Category tidak boleh kosong")
 		return
 	}
 
 	//get id dari database
+
 	CategoryID, _ := method.GetCategoryID(r.FormValue("category"))
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
@@ -70,6 +71,41 @@ func CreateTopic(w http.ResponseWriter, r *http.Request) {
 		s := Sprintf("%s Succesfully Created New Topic", Topic.Author)
 		log.Println(s)
 	}
+}
+
+func GetTopicByUserID(w http.ResponseWriter, r *http.Request) {
+	Println("Endpoint Hit: GetTopicByUserID")
+
+	// var result []models.Article
+	var response models.Response
+
+	vars := mux.Vars(r)
+
+	realResult, status := method.FindTopicByUserID(vars["userid"])
+	if status == false {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		response.Status = false
+		response.Message = "Failed to Get Appointment"
+		json.NewEncoder(w).Encode(response)
+	} else {
+		// result = append(result, realResult)
+		// result = realResult
+
+		data := map[string]interface{}{
+			"Appointments": realResult,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		message := "Appointments Get Succesfully"
+		w.WriteHeader(202)
+		response.Status = true
+		response.Message = message
+		response.Data = data
+		json.NewEncoder(w).Encode(response)
+
+	}
+
 }
 
 // GetTopicByID : get topic dengan id tertentu
@@ -189,7 +225,7 @@ func ReplyTopic(w http.ResponseWriter, r *http.Request) {
 	Reply.Author = Sprintf("%v", userReal["Name"])
 	Reply.AuthorID, _ = strconv.Atoi(Sprintf("%v", userReal["ID"]))
 
-	Reply.Content = r.FormValue("Content")
+	Reply.Content = r.FormValue("content")
 	if len(Reply.Content) == 0 {
 		json.NewEncoder(w).Encode("Content tidak boleh kosong")
 		return

@@ -51,6 +51,45 @@ func Insert(time_appointment string, doctor_name string, pet_owner_name string, 
 
 }
 
+func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
+
+	var Appointment models.Appointment
+	var Appointments []models.Appointment
+
+	userid, err := strconv.Atoi(id)
+	// Println(id)
+	if err != nil {
+		Println("format ID salah")
+		return Appointments, false
+	}
+
+	sqlStatement := "select * from appointment where pet_owner_id = ?"
+	results, err := db.Query(sqlStatement, userid)
+	if err != nil {
+		panic(err.Error())
+		return Appointments, false
+	}
+	for results.Next() {
+		err = results.Scan(&Appointment.AppointmentID,
+			&Appointment.Time_Appointment,
+			&Appointment.Doctor_name,
+			&Appointment.Pet_Owner_Name,
+			&Appointment.Pet_Type,
+			&Appointment.Complaint,
+			&Appointment.IsPaid,
+			&Appointment.CreatedAt,
+			&Appointment.UpdatedAt,
+			&Appointment.Pet_owner_id)
+		if err != nil {
+			panic(err.Error())
+			return Appointments, false
+		} else {
+			Appointments = append(Appointments, Appointment)
+		}
+	}
+	return Appointments, false
+}
+
 func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, error) {
 	var Appointment models.Appointment
 	var Appointments []models.Appointment
