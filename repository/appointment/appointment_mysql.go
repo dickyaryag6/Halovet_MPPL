@@ -199,3 +199,41 @@ func Update(id string, doctor_name string, pet_type string, complaint string, ap
 	return true
 
 }
+
+func ValidatePayment(appointmentid int) bool {
+	// appointmentid, err := strconv.Atoi(id)
+	// if err != nil {
+	// 	Println("format ID salah")
+	// }
+
+	sqlStatement := "update appointment set is_paid = 1 where id = ?"
+	row, err := db.Exec(sqlStatement, appointmentid)
+
+	if err != nil {
+		Println(err.Error())
+		return false
+	}
+
+	count, err := row.RowsAffected()
+	if count == 0 {
+		return false
+	}
+	return true
+}
+
+func CheckValidation(appointmentid int) bool {
+
+	// appointmentid, err := strconv.Atoi(id)
+	// if err != nil {
+	// 	Println("format ID salah")
+	// }
+
+	var statusPembayaran int
+	sqlStatement := "select is_paid appointment where id = ?"
+	err = db.QueryRow(sqlStatement, appointmentid).Scan(&statusPembayaran)
+
+	if statusPembayaran == 1 {
+		return false
+	}
+	return true
+}

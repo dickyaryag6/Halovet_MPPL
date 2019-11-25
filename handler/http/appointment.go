@@ -335,10 +335,31 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("done"))
-
+	w.Write([]byte("Berhasil Upload Bukti Pembayaran"))
+	return
 }
 
 func ValidatePay(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	appointmentid, err := strconv.Atoi(vars["appointmentid"])
+	if err != nil {
+		Println("format ID salah")
+	}
+
+	//CEK APAKAH SUDAH PEMBAYARAN SUDAH DILAKUKAN
+	status := method.CheckValidation(appointmentid)
+	if status == false {
+		w.Write([]byte("Validasi Pembayaran sudah dilakukan"))
+		return
+	}
+
+	status = method.ValidatePayment(appointmentid)
+	if status == false {
+		w.Write([]byte("Gagal Validasi Pembayaran"))
+		return
+	} else {
+		w.Write([]byte("Berhasil Validasi Pembayaran"))
+		return
+	}
 
 }

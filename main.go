@@ -86,6 +86,8 @@ func handleRequest() {
 	adminappointment := router.PathPrefix("/admin/appointment").Subrouter()
 	adminappointment.Use(mid.JWTAuthorization)
 	adminappointment.HandleFunc("", handler.GetAllAppointment).Methods("GET")
+	//VALIDASI BUKTI PEMBAYARAN
+	adminappointment.HandleFunc("/{appointmentid}/validatePayment", handler.ValidatePay).Methods("PUT")
 
 	//PENCARIAN
 
