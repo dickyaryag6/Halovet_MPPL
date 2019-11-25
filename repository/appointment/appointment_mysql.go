@@ -87,7 +87,7 @@ func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
 			Appointments = append(Appointments, Appointment)
 		}
 	}
-	return Appointments, false
+	return Appointments, true
 }
 
 func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, error) {
