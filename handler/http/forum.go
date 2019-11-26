@@ -28,7 +28,7 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
 		response.Status = false
-		response.Message = "Failed to Get Appointment"
+		response.Message = "Failed to Get Forum"
 		json.NewEncoder(w).Encode(response)
 	} else {
 		// result = append(result, realResult)
@@ -39,7 +39,7 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		message := "Appointments Get Succesfully"
+		message := "Forum Get Succesfully"
 		w.WriteHeader(202)
 		response.Status = true
 		response.Message = message

@@ -56,7 +56,7 @@ func handleRequest() {
 	// get topic forum by id
 	forum.HandleFunc("/user/{userid}", handler.GetTopicByUserID).Methods("GET")
 	//get all forum
-	forums.HandleFunc("/", handler.GetAllForum).Methods("GET")
+	forums.HandleFunc("", handler.GetAllForum).Methods("GET")
 
 	reply := router.PathPrefix("/forum").Subrouter()
 	reply.Use(mid.JWTAuthorization)
