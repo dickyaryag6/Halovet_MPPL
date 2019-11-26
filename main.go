@@ -42,7 +42,9 @@ func handleRequest() {
 
 	// FORUM
 	forum := router.PathPrefix("/forum").Subrouter()
+	forums := router.PathPrefix("/forums").Subrouter()
 	forum.Use(mid.JWTAuthorization)
+	forums.Use(mid.JWTAuthorization)
 	// create topic forum
 	forum.HandleFunc("", handler.CreateTopic).Methods("POST") //forum
 	// get suatu topic forum
@@ -53,6 +55,8 @@ func handleRequest() {
 	forum.HandleFunc("/{topicid}", handler.DeleteTopic).Methods("DELETE") //forum/topicid
 	// get topic forum by id
 	forum.HandleFunc("/user/{userid}", handler.GetTopicByUserID).Methods("GET")
+	//get all forum
+	forums.HandleFunc("/", handler.GetAllForum).Methods("GET")
 
 	reply := router.PathPrefix("/forum").Subrouter()
 	reply.Use(mid.JWTAuthorization)
@@ -69,7 +73,6 @@ func handleRequest() {
 	// list semua topic dengan kategori tertentu
 	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
 
-
 	// ARTICLE
 	article := router.PathPrefix("/admin/article").Subrouter()
 	article.Use(mid.JWTAuthorization)
@@ -85,7 +88,7 @@ func handleRequest() {
 	//VALIDASI BUKTI PEMBAYARAN
 	admin.HandleFunc("/appointment/{appointmentid}/validatePayment", handler.ValidatePay).Methods("PUT")
 	// get all topic
-	admin.HandleFunc("/forum", handler.GetAllForum).Methods("GET")
+	// admin.HandleFunc("/forum", handler.GetAllForum).Methods("GET")
 
 	//PENCARIAN
 
