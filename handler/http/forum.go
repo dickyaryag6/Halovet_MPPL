@@ -35,7 +35,7 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 		// result = realResult
 
 		data := map[string]interface{}{
-			"Appointments": realResult,
+			"Forums": realResult,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
