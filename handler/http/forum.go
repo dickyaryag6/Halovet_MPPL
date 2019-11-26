@@ -13,6 +13,42 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func GetAllForum(w http.ResponseWriter, r *http.Request) {
+	Println("Endpoint Hit: GetAllForum")
+
+	var response models.Response
+
+	querymap := r.URL.Query()
+	limitstart := querymap["limitstart"][0]
+	limit := querymap["limit"][0]
+
+	realResult, status := method.FindAllTopic(limitstart, limit)
+
+	if status == false {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		response.Status = false
+		response.Message = "Failed to Get Appointment"
+		json.NewEncoder(w).Encode(response)
+	} else {
+		// result = append(result, realResult)
+		// result = realResult
+
+		data := map[string]interface{}{
+			"Appointments": realResult,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		message := "Appointments Get Succesfully"
+		w.WriteHeader(202)
+		response.Status = true
+		response.Message = message
+		response.Data = data
+		json.NewEncoder(w).Encode(response)
+
+	}
+}
+
 // CreateTopic : membuat topic baru
 func CreateTopic(w http.ResponseWriter, r *http.Request) {
 	Println("Endpoint Hit: CreateTopic")

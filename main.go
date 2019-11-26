@@ -38,6 +38,7 @@ func handleRequest() {
 	appointment.HandleFunc("/{id}", handler.GetAppointmentByID).Methods("GET")   //appointment/{id}
 	appointment.HandleFunc("/{id}", handler.DeleteAppointment).Methods("DELETE") //appointment/{id}
 	appointment.HandleFunc("/{id}", handler.UpdateAppointment).Methods("PUT")    //appointment/{id}
+	appointment.HandleFunc("/user/{userid}", handler.GetAppointmentByUserID).Methods("GET")
 
 	// FORUM
 	forum := router.PathPrefix("/forum").Subrouter()
@@ -50,6 +51,8 @@ func handleRequest() {
 	forum.HandleFunc("/{topicid}", handler.UpdateTopic).Methods("PUT") //forum/topicid
 	// delete pertanyaan topic forum
 	forum.HandleFunc("/{topicid}", handler.DeleteTopic).Methods("DELETE") //forum/topicid
+	// get topic forum by id
+	forum.HandleFunc("/user/{userid}", handler.GetTopicByUserID).Methods("GET")
 
 	reply := router.PathPrefix("/forum").Subrouter()
 	reply.Use(mid.JWTAuthorization)
@@ -66,13 +69,6 @@ func handleRequest() {
 	// list semua topic dengan kategori tertentu
 	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
 
-	//GET BERDASARKAN ID USER
-	user := router.PathPrefix("/{userid}").Subrouter()
-	user.Use(mid.JWTAuthorization)
-	//APPOINTMENT
-	user.HandleFunc("/appointment", handler.GetAppointmentByUserID).Methods("GET")
-	//TOPIC FORUM
-	user.HandleFunc("/topic", handler.GetTopicByUserID).Methods("GET")
 
 	// ARTICLE
 	article := router.PathPrefix("/admin/article").Subrouter()
@@ -83,11 +79,13 @@ func handleRequest() {
 	article.HandleFunc("/{articleid}", handler.DeleteArticle).Methods("DELETE")
 
 	//KHUSUS ADMIN
-	adminappointment := router.PathPrefix("/admin/appointment").Subrouter()
-	adminappointment.Use(mid.JWTAuthorization)
-	adminappointment.HandleFunc("", handler.GetAllAppointment).Methods("GET")
+	admin := router.PathPrefix("/admin").Subrouter()
+	admin.Use(mid.JWTAuthorization)
+	admin.HandleFunc("/appointment", handler.GetAllAppointment).Methods("GET")
 	//VALIDASI BUKTI PEMBAYARAN
-	adminappointment.HandleFunc("/{appointmentid}/validatePayment", handler.ValidatePay).Methods("PUT")
+	admin.HandleFunc("/appointment/{appointmentid}/validatePayment", handler.ValidatePay).Methods("PUT")
+	// get all topic
+	admin.HandleFunc("/forum", handler.GetAllForum).Methods("GET")
 
 	//PENCARIAN
 

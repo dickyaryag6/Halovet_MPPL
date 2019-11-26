@@ -24,6 +24,77 @@ func init() {
 
 // CRUD TOPIC FORUM
 
+func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
+	var ForumTopic models.ForumTopic
+	var ForumTopics []models.ForumTopic
+
+	realLimitStart, err := strconv.Atoi(limitstart)
+	if err != nil {
+		Println("format limit salah")
+		return ForumTopics, false
+	}
+	realLimit, err := strconv.Atoi(limit)
+	if err != nil {
+		Println("format limit salah")
+		return ForumTopics, false
+	}
+
+	sqlStatement := "select * from forum_topic order by created_at limit ?, ?"
+	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
+	if err != nil {
+		panic(err.Error())
+		return ForumTopics, false
+	}
+
+	var CategoryID int
+	for results.Next() {
+		err = results.Scan(&ForumTopic.TopicID,
+			&CategoryID,
+			&ForumTopic.Title,
+			&ForumTopic.Author,
+			&ForumTopic.Content,
+			&ForumTopic.CreatedAt,
+			&ForumTopic.UpdatedAt,
+			&ForumTopic.AuthorID,
+		)
+		// Println(ForumTopic.TopicID, ForumTopic.Title)
+		if err != nil {
+			panic(err.Error())
+			return ForumTopics, false
+		} else {
+			var Reply models.ForumReply
+			var Replies []models.ForumReply
+
+			sqlStatement = "select * from forum_reply where topic_id = ?"
+			results, err := db.Query(sqlStatement, ForumTopic.TopicID)
+			if err != nil {
+				panic(err.Error()) // proper error handling instead of panic in your app
+				return ForumTopics, false
+			}
+			for results.Next() {
+				err = results.Scan(&Reply.ReplyID,
+					&Reply.TopicID,
+					&Reply.Author,
+					&Reply.AuthorID,
+					&Reply.Content,
+					&Reply.CreatedAt,
+					&Reply.UpdatedAt)
+				if err != nil {
+					panic(err.Error())
+					return ForumTopics, false
+				} else {
+					Replies = append(Replies, Reply)
+				}
+
+			}
+			ForumTopic.Replies = Replies
+			ForumTopic.Category, _ = FindCategory(CategoryID)
+			ForumTopics = append(ForumTopics, ForumTopic)
+		}
+	}
+	return ForumTopics, true
+}
+
 func FindTopicByUserID(id string) ([]models.ForumTopic, bool) {
 
 	var ForumTopic models.ForumTopic

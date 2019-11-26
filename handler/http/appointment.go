@@ -59,7 +59,8 @@ func GetAppointmentByUserID(w http.ResponseWriter, r *http.Request) {
 
 //YANG DIKEMBALIKAN CUMA APPOINTMENT DENGAN USER ID TERTENTU
 func GetAllAppointment(w http.ResponseWriter, r *http.Request) {
-	Println("GET params were:", r.URL.Query())
+	Println("Endpoint Hit: GetAllAppointment")
+	// Println("GET params were:", r.URL.Query())
 
 	var response models.Response
 	// var result []models.Appointment
