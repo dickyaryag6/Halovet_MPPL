@@ -9,6 +9,15 @@ CREATE TABLE `account` (
   UNIQUE KEY `email_UNIQUE` (`email`)
 );
 
+INSERT INTO `account` (
+  `name`,`email`,`password`,`role`
+) values
+ ( `admin`,
+  `admin@gmail.com`,
+  `123456`,
+  3)
+);
+
 CREATE TABLE `appointment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `appointment_time` timestamp NOT NULL,
@@ -20,10 +29,10 @@ CREATE TABLE `appointment` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `pet_owner_id` bigint(20) NOT NULL,
-  `photopath` varchar(200) DEFAULT NULL,
+  `photopath` varchar(200) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ;
+);
 
 CREATE TABLE `articles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -33,9 +42,9 @@ CREATE TABLE `articles` (
   `content` varchar(200) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `photopath` varchar(200) DEFAULT NULL,
+  `photopath` varchar(200) DEFAULT '0',
   PRIMARY KEY (`id`)
-);
+) ;
 
 CREATE TABLE `forum_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
