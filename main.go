@@ -74,12 +74,13 @@ func handleRequest() {
 	// forum.HandleFunc("/{category}", handler.ListTopicByCategory).Methods("GET")
 
 	// ARTICLE
-	article := router.PathPrefix("/admin/article").Subrouter()
+	// adminarticle := router.PathPrefix("/article").Subrouter()
+	article := router.PathPrefix("/article").Subrouter()
+	articles := router.PathPrefix("/articles").Subrouter()
 	article.Use(mid.JWTAuthorization)
-	article.HandleFunc("", handler.CreateArticle).Methods("POST")
+	articles.Use(mid.JWTAuthorization)
 	article.HandleFunc("/{articleid}", handler.GetArticle).Methods("GET")
-	article.HandleFunc("/{articleid}", handler.UpdateArticle).Methods("PUT")
-	article.HandleFunc("/{articleid}", handler.DeleteArticle).Methods("DELETE")
+	articles.HandleFunc("", handler.GetAllArticle).Methods("GET")
 
 	//KHUSUS ADMIN
 	admin := router.PathPrefix("/admin").Subrouter()
@@ -87,7 +88,11 @@ func handleRequest() {
 	admin.HandleFunc("/appointment", handler.GetAllAppointment).Methods("GET")
 	//VALIDASI BUKTI PEMBAYARAN
 	admin.HandleFunc("/appointment/{appointmentid}/validatePayment", handler.ValidatePay).Methods("PUT")
-	// get all topic
+	// get all articles
+	admin.HandleFunc("/article", handler.CreateArticle).Methods("POST")
+	admin.HandleFunc("/article/{articleid}", handler.DeleteArticle).Methods("DELETE")
+	admin.HandleFunc("/article/{articleid}", handler.UpdateArticle).Methods("PUT")
+
 	// admin.HandleFunc("/forum", handler.GetAllForum).Methods("GET")
 
 	//PENCARIAN

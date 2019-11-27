@@ -50,6 +50,46 @@ func InsertArticle(title string, content string, author string, authorid int) (m
 	return Article, nil
 }
 
+func FindAllArticles(limitstart string, limit string) ([]models.Article, error) {
+	var Article models.Article
+	var Articles []models.Article
+
+	realLimitStart, err := strconv.Atoi(limitstart)
+	if err != nil {
+		Println("format limit salah")
+		return Articles, err
+	}
+	realLimit, err := strconv.Atoi(limit)
+	if err != nil {
+		Println("format limit salah")
+		return Articles, err
+	}
+
+	sqlStatement := "select * from articles order by created_at limit ?, ?"
+	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
+	if err != nil {
+		panic(err.Error())
+		return Articles, err
+	}
+	for results.Next() {
+		err = results.Scan(&Article.ID,
+			&Article.Title,
+			&Article.Author,
+			&Article.AuthorID,
+			&Article.Content,
+			&Article.CreatedAt,
+			&Article.UpdatedAt)
+		if err != nil {
+			panic(err.Error())
+		} else {
+			Articles = append(Articles, Article)
+		}
+
+	}
+
+	return Articles, nil
+}
+
 func FindArticle(articleid string) (models.Article, error) {
 	var Article models.Article
 	id, err := strconv.Atoi(articleid)
@@ -90,7 +130,7 @@ func UpdateArticle(articleid string, title string, content string) bool {
 		// Println(err.Error())
 		return false
 	} else {
-		Println("ha")
+		// Println("ha")
 		timeNow := Sprintf(time.Now().Format("2006-01-02 15:04:05"))
 		sqlStatement := "update articles set title = ?, content = ?, updated_at = ? where id = ?"
 		_, err := db.Exec(sqlStatement, title, content, timeNow, id)

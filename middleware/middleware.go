@@ -134,21 +134,46 @@ func Doctor(next http.Handler) http.Handler {
 	})
 }
 
-func Admin(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//CEK APAKAH PET OWNER APA BUKAN
+func userIsAdmin(role int) bool {
+	if role == 3 {
+		return true
+	}
+	return false
+}
+
+func AdminOnly(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 		user := userInfo["User"]
 		userReal, _ := user.(map[string]interface{})
 		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
-		if err == nil {
-			Println(Role)
+		if err != nil {
+			panic("Gagal mendapatkan role user")
 		}
-		if Role != 3 {
-			w.Write([]byte("Only Admin is allowed to do this method"))
+		if !userIsAdmin(Role) {
+			http.Error(w, "Admin only", http.StatusUnauthorized)
 			return
 		}
 		next.ServeHTTP(w, r)
-	})
+	}
 }
+
+// func Admin(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		//CEK APAKAH PET OWNER APA BUKAN
+
+// 		userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
+// 		user := userInfo["User"]
+// 		userReal, _ := user.(map[string]interface{})
+// 		Role, err := strconv.Atoi(Sprintf("%v", userReal["Role"]))
+// 		if err == nil {
+// 			Println(Role)
+// 		}
+// 		if Role != 3 {
+// 			w.Write([]byte("Only Admin is allowed to do this method"))
+// 			return
+// 		}
+// 		next.ServeHTTP(w, r)
+// 	})
+// }

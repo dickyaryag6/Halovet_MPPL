@@ -12,6 +12,39 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func GetAllArticle(w http.ResponseWriter, r *http.Request) {
+	Println("Endpoint Hit: GetAllArticle")
+
+	var response models.Response
+	querymap := r.URL.Query()
+	limitstart := querymap["limitstart"][0]
+	// Printf("%T\n", limitstart)
+	limit := querymap["limit"][0]
+
+	realResult, err := method.FindAllArticles(limitstart, limit)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		response.Status = false
+		response.Message = "Failed to Get Articles"
+		json.NewEncoder(w).Encode(response)
+	} else {
+
+		data := map[string]interface{}{
+			"Articles": realResult,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		message := "Articles Get Succesfully"
+		w.WriteHeader(202)
+		response.Status = true
+		response.Message = message
+		response.Data = data
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	Println("Endpoint Hit: CreateArticle")
 	var article models.Article
@@ -120,7 +153,7 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 		response.Message = "Article Failed to Update"
 		json.NewEncoder(w).Encode(response)
 	} else {
-		Println("haha")
+		// Println("haha")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(202)
 		response.Status = true
