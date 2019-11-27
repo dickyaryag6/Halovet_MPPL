@@ -86,7 +86,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 		timeNow,
 		filepath.Ext(handler.Filename))
 
-	article.PhotoPath = filepath.Join(dir, "articlephotos", filename)
+	article.PhotoPath = filepath.Join(dir, "public/articlephotos", filename)
 	targetFile, err := os.OpenFile(article.PhotoPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		json.NewEncoder(w).Encode(err.Error())

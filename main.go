@@ -5,6 +5,8 @@ import (
 	mid "Halovet/middleware"
 	"fmt"
 
+	// "path/filepath"
+
 	"log"
 	"net/http"
 
@@ -17,10 +19,26 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to Homepage")
 }
 
+// func servePic(w http.ResponseWriter, r *http.Request) {
+// 	// querymap := r.URL.Query()
+// 	// namadokter := querymap["doctor"][0]
+// 	// petownername := querymap["petowner"][0]
+// 	// timeappointment := querymap["time"][0]
+
+// 	folder := ""
+// 	fileserved := filepath.Join(folder, filename, ".jpg")
+// 	http.ServeFile(w, r, fileserved)
+// }
+
 func handleRequest() {
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
+
+	//serve static file
+	router.
+		PathPrefix("/static/").
+		Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
 
 	// ACCOUNT
 	account := router.PathPrefix("/account").Subrouter()
@@ -80,6 +98,7 @@ func handleRequest() {
 	article.Use(mid.JWTAuthorization)
 	articles.Use(mid.JWTAuthorization)
 	article.HandleFunc("/{articleid}", handler.GetArticle).Methods("GET")
+	// article.Handle("/static/{photopath}/", servePic)
 	articles.HandleFunc("", handler.GetAllArticle).Methods("GET")
 
 	//KHUSUS ADMIN

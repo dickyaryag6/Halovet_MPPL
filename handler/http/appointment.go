@@ -322,7 +322,7 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 		appointment.Doctor_name,
 		filepath.Ext(handler.Filename))
 
-	fileLocation := filepath.Join(dir, "payment", filename)
+	fileLocation := filepath.Join(dir, "public/payment", filename)
 	//hasil join Halovet/payment/namafile
 	targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -330,7 +330,6 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
 	defer targetFile.Close()
 
 	if _, err := io.Copy(targetFile, uploadedFile); err != nil {
@@ -338,6 +337,13 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//UPDATE KOLOM photopath appointment biar isinya namapath
+	sqlStatement = "update appointment set photopath  = ? where id = ?"
+	_, err = db.Exec(sqlStatement, filename, appointmentid)
+	if err != nil {
+		Println(err.Error())
+		return
+	}
 	w.Write([]byte("Berhasil Upload Bukti Pembayaran"))
 	return
 }
