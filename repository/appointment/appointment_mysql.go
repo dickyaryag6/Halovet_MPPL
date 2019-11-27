@@ -79,7 +79,8 @@ func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
 			&Appointment.IsPaid,
 			&Appointment.CreatedAt,
 			&Appointment.UpdatedAt,
-			&Appointment.Pet_owner_id)
+			&Appointment.Pet_owner_id,
+			&Appointment.PhotoPath)
 		if err != nil {
 			panic(err.Error())
 			return Appointments, false

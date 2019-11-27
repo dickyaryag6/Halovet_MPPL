@@ -12,6 +12,7 @@ type Appointment struct {
 	Complaint        string
 	CreatedAt        string
 	UpdatedAt        string
+	PhotoPath string
 }
 
 type Article struct {
