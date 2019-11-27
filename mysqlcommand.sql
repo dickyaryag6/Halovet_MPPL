@@ -32,6 +32,7 @@ CREATE TABLE `articles` (
   `content` varchar(200) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `photopath` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
 

@@ -24,26 +24,26 @@ func init() {
 
 // CRUD TOPIC FORUM
 
-func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
+func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, int, bool) {
 	var ForumTopic models.ForumTopic
 	var ForumTopics []models.ForumTopic
 
 	realLimitStart, err := strconv.Atoi(limitstart)
 	if err != nil {
 		Println("format limit salah")
-		return ForumTopics, false
+		return ForumTopics, 0, false
 	}
 	realLimit, err := strconv.Atoi(limit)
 	if err != nil {
 		Println("format limit salah")
-		return ForumTopics, false
+		return ForumTopics, 0, false
 	}
 
 	sqlStatement := "select * from forum_topic order by created_at limit ?, ?"
 	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
 	if err != nil {
 		panic(err.Error())
-		return ForumTopics, false
+		return ForumTopics, 0, false
 	}
 
 	var CategoryID int
@@ -60,7 +60,7 @@ func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
 		// Println(ForumTopic.TopicID, ForumTopic.Title)
 		if err != nil {
 			panic(err.Error())
-			return ForumTopics, false
+			return ForumTopics, 0, false
 		} else {
 			var Reply models.ForumReply
 			var Replies []models.ForumReply
@@ -69,7 +69,7 @@ func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
 			results, err := db.Query(sqlStatement, ForumTopic.TopicID)
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
-				return ForumTopics, false
+				return ForumTopics, 0, false
 			}
 			for results.Next() {
 				err = results.Scan(&Reply.ReplyID,
@@ -81,7 +81,7 @@ func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
 					&Reply.UpdatedAt)
 				if err != nil {
 					panic(err.Error())
-					return ForumTopics, false
+					return ForumTopics, 0, false
 				} else {
 					Replies = append(Replies, Reply)
 				}
@@ -92,7 +92,17 @@ func FindAllTopic(limitstart string, limit string) ([]models.ForumTopic, bool) {
 			ForumTopics = append(ForumTopics, ForumTopic)
 		}
 	}
-	return ForumTopics, true
+
+	var count int
+
+	err = db.QueryRow("SELECT COUNT(*) FROM forum_topic ").Scan(&count)
+
+	if err != nil {
+		log.Fatal(err)
+		return ForumTopics, 0, false
+	}
+
+	return ForumTopics, count, true
 }
 
 func FindTopicByUserID(id string) ([]models.ForumTopic, bool) {

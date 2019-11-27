@@ -4,9 +4,14 @@ import (
 	models "Halovet/models"
 	method "Halovet/repository/article"
 	"encoding/json"
+	"fmt"
 	. "fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -21,7 +26,7 @@ func GetAllArticle(w http.ResponseWriter, r *http.Request) {
 	// Printf("%T\n", limitstart)
 	limit := querymap["limit"][0]
 
-	realResult, err := method.FindAllArticles(limitstart, limit)
+	realResult, rowcount, err := method.FindAllArticles(limitstart, limit)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -32,7 +37,8 @@ func GetAllArticle(w http.ResponseWriter, r *http.Request) {
 	} else {
 
 		data := map[string]interface{}{
-			"Articles": realResult,
+			"Articles":  realResult,
+			"Row_Count": rowcount,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -45,6 +51,10 @@ func GetAllArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func savePhoto() {
+
+}
+
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	Println("Endpoint Hit: CreateArticle")
 	var article models.Article
@@ -55,7 +65,39 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	article.Content = r.FormValue("content")
 	if len(article.Title) == 0 || len(article.Content) == 0 {
 		json.NewEncoder(w).Encode("Title atau Content tidak boleh Kosong")
-		return
+
+	}
+	uploadedFile, handler, err := r.FormFile("photo")
+	if err != nil {
+		// Println(err.Error())
+		json.NewEncoder(w).Encode(err.Error())
+	}
+	defer uploadedFile.Close()
+
+	dir, err := os.Getwd()
+	// dir == folder Project
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+	}
+
+	timeNow := Sprintf(time.Now().Format("2006-01-02"))
+	filename := fmt.Sprintf("%s-%s%s",
+		article.Title,
+		timeNow,
+		filepath.Ext(handler.Filename))
+
+	article.PhotoPath = filepath.Join(dir, "articlephotos", filename)
+	targetFile, err := os.OpenFile(article.PhotoPath, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+
+	}
+
+	defer targetFile.Close()
+	// Printf("%T\n", article.PhotoPath)
+	if _, err := io.Copy(targetFile, uploadedFile); err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+
 	}
 
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
@@ -72,7 +114,9 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 		article.Title,
 		article.Content,
 		article.Author,
-		article.AuthorID)
+		article.AuthorID,
+		article.PhotoPath,
+	)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
@@ -87,7 +131,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 			"Article": result,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(201)
+		w.WriteHeader(200)
 		response.Status = true
 		response.Message = "Succesfully Create Article"
 		response.Data = data
@@ -153,7 +197,6 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 		response.Message = "Article Failed to Update"
 		json.NewEncoder(w).Encode(response)
 	} else {
-		// Println("haha")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(202)
 		response.Status = true

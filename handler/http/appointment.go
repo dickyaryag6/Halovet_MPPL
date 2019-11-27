@@ -71,7 +71,7 @@ func GetAllAppointment(w http.ResponseWriter, r *http.Request) {
 	limit := querymap["limit"][0]
 	// Println(limit)
 
-	realResult, err := method.FindAllAppointment(limitstart, limit)
+	realResult, rowcount, err := method.FindAllAppointment(limitstart, limit)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -84,6 +84,7 @@ func GetAllAppointment(w http.ResponseWriter, r *http.Request) {
 
 		data := map[string]interface{}{
 			"Appointments": realResult,
+			"Row_Count":    rowcount,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -314,7 +315,7 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Println(err.Error())
 	}
-	Println(appointment.Pet_Owner_Name, appointment.Time_Appointment[0:10], appointment.Doctor_name)
+	// Println(appointment.Pet_Owner_Name, appointment.Time_Appointment[0:10], appointment.Doctor_name)
 	filename := fmt.Sprintf("%s-%s-%s%s",
 		appointment.Pet_Owner_Name,
 		appointment.Time_Appointment[0:10],
@@ -329,6 +330,7 @@ func UploadPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
 	defer targetFile.Close()
 
 	if _, err := io.Copy(targetFile, uploadedFile); err != nil {

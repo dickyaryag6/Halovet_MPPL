@@ -22,6 +22,7 @@ type Article struct {
 	Content   string
 	CreatedAt string
 	UpdatedAt string
+	PhotoPath string
 }
 
 type Account struct {

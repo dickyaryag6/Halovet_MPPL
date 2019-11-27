@@ -22,7 +22,7 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 	limitstart := querymap["limitstart"][0]
 	limit := querymap["limit"][0]
 
-	realResult, status := method.FindAllTopic(limitstart, limit)
+	realResult, rowcount, status := method.FindAllTopic(limitstart, limit)
 
 	if status == false {
 		w.Header().Set("Content-Type", "application/json")
@@ -35,7 +35,8 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 		// result = realResult
 
 		data := map[string]interface{}{
-			"Forums": realResult,
+			"Forums":    realResult,
+			"Count_Row": rowcount,
 		}
 
 		w.Header().Set("Content-Type", "application/json")

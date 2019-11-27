@@ -90,26 +90,26 @@ func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
 	return Appointments, true
 }
 
-func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, error) {
+func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, int, error) {
 	var Appointment models.Appointment
 	var Appointments []models.Appointment
 
 	realLimitStart, err := strconv.Atoi(limitstart)
 	if err != nil {
 		Println("format limit salah")
-		return Appointments, err
+		return Appointments, 0, err
 	}
 	realLimit, err := strconv.Atoi(limit)
 	if err != nil {
 		Println("format limit salah")
-		return Appointments, err
+		return Appointments, 0, err
 	}
 
 	sqlStatement := "select * from appointment order by created_at limit ?, ?"
 	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
 	if err != nil {
 		panic(err.Error())
-		return Appointments, err
+		return Appointments, 0, err
 	}
 	for results.Next() {
 		err = results.Scan(&Appointment.AppointmentID,
@@ -130,7 +130,16 @@ func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, 
 
 	}
 
-	return Appointments, nil
+	var count int
+
+	err = db.QueryRow("SELECT COUNT(*) FROM appointment").Scan(&count)
+
+	if err != nil {
+		log.Fatal(err)
+		return Appointments, 0, err
+	}
+
+	return Appointments, count, nil
 }
 
 func FindbyID(id string) (models.Appointment, bool) {

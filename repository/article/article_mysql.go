@@ -21,11 +21,11 @@ func init() {
 	}
 }
 
-func InsertArticle(title string, content string, author string, authorid int) (models.Article, error) {
+func InsertArticle(title string, content string, author string, authorid int, photopath string) (models.Article, error) {
 	var Article models.Article
 
-	sqlStatement := "insert into articles (title, content, author, author_id) values (?,?,?,?)"
-	row, err := db.Exec(sqlStatement, title, content, author, authorid)
+	sqlStatement := "insert into articles (title, content, author, author_id, photopath) values (?,?,?,?,?)"
+	row, err := db.Exec(sqlStatement, title, content, author, authorid, photopath)
 	if err != nil {
 		Print(err.Error())
 		return Article, nil
@@ -46,30 +46,31 @@ func InsertArticle(title string, content string, author string, authorid int) (m
 	Article.Content = content
 	Article.CreatedAt = Sprintf(time.Now().Format("2006-01-02 15:04:05"))
 	Article.UpdatedAt = Sprintf(time.Now().Format("2006-01-02 15:04:05"))
+	Article.PhotoPath = photopath
 
 	return Article, nil
 }
 
-func FindAllArticles(limitstart string, limit string) ([]models.Article, error) {
+func FindAllArticles(limitstart string, limit string) ([]models.Article, int, error) {
 	var Article models.Article
 	var Articles []models.Article
 
 	realLimitStart, err := strconv.Atoi(limitstart)
 	if err != nil {
 		Println("format limit salah")
-		return Articles, err
+		return Articles, 0, err
 	}
 	realLimit, err := strconv.Atoi(limit)
 	if err != nil {
 		Println("format limit salah")
-		return Articles, err
+		return Articles, 0, err
 	}
 
 	sqlStatement := "select * from articles order by created_at limit ?, ?"
 	results, err := db.Query(sqlStatement, realLimitStart, realLimit)
 	if err != nil {
 		panic(err.Error())
-		return Articles, err
+		return Articles, 0, err
 	}
 	for results.Next() {
 		err = results.Scan(&Article.ID,
@@ -87,7 +88,16 @@ func FindAllArticles(limitstart string, limit string) ([]models.Article, error) 
 
 	}
 
-	return Articles, nil
+	var count int
+
+	err = db.QueryRow("SELECT COUNT(*) FROM articles").Scan(&count)
+
+	if err != nil {
+		log.Fatal(err)
+		return Articles, 0, err
+	}
+
+	return Articles, count, nil
 }
 
 func FindArticle(articleid string) (models.Article, error) {
