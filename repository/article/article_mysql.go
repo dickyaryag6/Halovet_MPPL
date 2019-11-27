@@ -85,7 +85,7 @@ func FindAllArticles(limitstart string, limit string) ([]models.Article, int, er
 		if err != nil {
 			panic(err.Error())
 		} else {
-			if nullhandler == '0' {
+			if nullhandler == "0" {
 				Article.PhotoPath = "-"
 			} else {
 				Article.PhotoPath = nullhandler

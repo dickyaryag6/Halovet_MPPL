@@ -70,14 +70,17 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	uploadedFile, handler, err := r.FormFile("photo")
 	if err != nil {
 		// Println(err.Error())
-		json.NewEncoder(w).Encode(err.Error())
+		Println(err.Error())
+
 	}
 	defer uploadedFile.Close()
 
 	dir, err := os.Getwd()
 	// dir == folder Project
 	if err != nil {
-		json.NewEncoder(w).Encode(err.Error())
+		// http.Error(w, err.Error(), http.StatusInternalServerError)
+		Println(err.Error())
+
 	}
 
 	timeNow := Sprintf(time.Now().Format("2006-01-02"))
@@ -86,17 +89,17 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 		timeNow,
 		filepath.Ext(handler.Filename))
 
-	fileLocation := filepath.Join(dir, "public/articlephotos", article.PhotoPath)
+	fileLocation := filepath.Join(dir, "public/article", article.PhotoPath)
 	targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		json.NewEncoder(w).Encode(err.Error())
+		Println(err.Error())
 
 	}
 
 	defer targetFile.Close()
 	// Printf("%T\n", article.PhotoPath)
 	if _, err := io.Copy(targetFile, uploadedFile); err != nil {
-		json.NewEncoder(w).Encode(err.Error())
+		Println(err.Error())
 
 	}
 
