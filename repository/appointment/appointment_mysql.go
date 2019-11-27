@@ -55,6 +55,7 @@ func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
 
 	var Appointment models.Appointment
 	var Appointments []models.Appointment
+	var nullhandler string
 
 	userid, err := strconv.Atoi(id)
 	// Println(id)
@@ -85,8 +86,14 @@ func FindAppointmentbyUserID(id string) ([]models.Appointment, bool) {
 			panic(err.Error())
 			return Appointments, false
 		} else {
-			Appointments = append(Appointments, Appointment)
+			if nullhandler == "0" {
+				Appointment.PhotoPath = "-"
+			} else {
+				Appointment.PhotoPath = nullhandler
+			}
+			
 		}
+		Appointments = append(Appointments, Appointment)
 	}
 	return Appointments, true
 }
@@ -112,6 +119,8 @@ func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, 
 		panic(err.Error())
 		return Appointments, 0, err
 	}
+
+	var nullhandler string
 	for results.Next() {
 		err = results.Scan(&Appointment.AppointmentID,
 			&Appointment.Time_Appointment,
@@ -122,12 +131,20 @@ func FindAllAppointment(limitstart string, limit string) ([]models.Appointment, 
 			&Appointment.IsPaid,
 			&Appointment.CreatedAt,
 			&Appointment.UpdatedAt,
-			&Appointment.Pet_owner_id)
+			&Appointment.Pet_owner_id,
+			&nullhandler,
+		)
 		if err != nil {
 			panic(err.Error())
 		} else {
-			Appointments = append(Appointments, Appointment)
+			if nullhandler == "0" {
+				Appointment.PhotoPath = "-"
+			} else {
+				Appointment.PhotoPath = nullhandler
+			}
+			
 		}
+		Appointments = append(Appointments, Appointment)
 
 	}
 
@@ -149,6 +166,7 @@ func FindbyID(id string) (models.Appointment, bool) {
 	if err != nil {
 		Println("format ID salah")
 	}
+	var nullhandler string
 	sql_statement := "select * from appointment where id = ?"
 	err = db.QueryRow(sql_statement, appointmentid).
 		Scan(&appointment.AppointmentID,
@@ -161,11 +179,20 @@ func FindbyID(id string) (models.Appointment, bool) {
 			&appointment.CreatedAt,
 			&appointment.UpdatedAt,
 			&appointment.Pet_owner_id,
+			&nullhandler,
 		)
 
 	if err != nil {
 		Println(err.Error())
 		return appointment, false
+	} else {
+		// Appointments = append(Appointments, Appointment)
+		if nullhandler == "0" {
+			appointment.PhotoPath = "-"
+		} else {
+			appointment.PhotoPath = nullhandler
+		}
+		
 	}
 
 	return appointment, true
