@@ -37,7 +37,7 @@ func GetAllArticle(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		message := "Articles Get Succesfully"
-		w.WriteHeader(202)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = message
 		response.Data = data
@@ -87,7 +87,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 			"Article": result,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(400)
+		w.WriteHeader(201)
 		response.Status = true
 		response.Message = "Succesfully Create Article"
 		response.Data = data
@@ -118,7 +118,7 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 			"Article": result,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = "Succesfully Get Article"
 		response.Data = data
@@ -179,7 +179,7 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(202)
+		w.WriteHeader(301)
 		response.Status = true
 		response.Message = "Article Succesfully Delete"
 		json.NewEncoder(w).Encode(response)

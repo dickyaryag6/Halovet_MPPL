@@ -40,7 +40,7 @@ func GetAllForum(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		message := "Forum Get Succesfully"
-		w.WriteHeader(202)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = message
 		response.Data = data
@@ -98,7 +98,7 @@ func CreateTopic(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(201)
 		response.Status = true
 		response.Message = "Succesfully Post New Topic"
 		response.Data = data
@@ -134,7 +134,7 @@ func GetTopicByUserID(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		message := "Appointments Get Succesfully"
-		w.WriteHeader(202)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = message
 		response.Data = data
@@ -157,7 +157,7 @@ func GetTopic(w http.ResponseWriter, r *http.Request) {
 
 	if status == false {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(404)
+		w.WriteHeader(400)
 		response.Status = false
 		response.Message = "Failed to Get Topic"
 		json.NewEncoder(w).Encode(response)
@@ -169,7 +169,7 @@ func GetTopic(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(202)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = "Successfully Get Topic"
 		response.Data = data
@@ -207,7 +207,7 @@ func UpdateTopic(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(202)
 		response.Status = true
 		response.Message = "Succesfully to Update Topic"
 		json.NewEncoder(w).Encode(response)
@@ -230,7 +230,7 @@ func DeleteTopic(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(301)
 		response.Status = true
 		response.Message = "Succesfully Delete Topic"
 		// response.Data = result
@@ -247,6 +247,7 @@ func ReplyTopic(w http.ResponseWriter, r *http.Request) {
 	if status == false {
 		// log.Println("Forum Topic not found")
 		//PRINT JSON FORUM ID TIDAK DITEMUKAN
+		w.WriteHeader(404)
 		json.NewEncoder(w).Encode("Forum Topic not found")
 		return
 	}
@@ -289,7 +290,7 @@ func ReplyTopic(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(201)
 		response.Status = true
 		response.Message = "Succesfully to Post Reply"
 		response.Data = data
@@ -324,7 +325,7 @@ func DeleteReply(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(301)
 		response.Status = true
 		response.Message = "Succesfully Delete Reply"
 		json.NewEncoder(w).Encode(response)
@@ -366,7 +367,7 @@ func UpdateReply(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(202)
 		response.Status = true
 		response.Message = "Succesfully to Update Reply"
 		json.NewEncoder(w).Encode(response)
@@ -407,7 +408,7 @@ func GetReply(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(202)
+		w.WriteHeader(302)
 		response.Status = true
 		response.Message = "Successfully Get Reply"
 		response.Data = data
