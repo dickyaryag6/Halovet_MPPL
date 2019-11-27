@@ -54,6 +54,7 @@ func InsertArticle(title string, content string, author string, authorid int, ph
 func FindAllArticles(limitstart string, limit string) ([]models.Article, int, error) {
 	var Article models.Article
 	var Articles []models.Article
+	var nullhandler string
 
 	realLimitStart, err := strconv.Atoi(limitstart)
 	if err != nil {
@@ -79,13 +80,19 @@ func FindAllArticles(limitstart string, limit string) ([]models.Article, int, er
 			&Article.AuthorID,
 			&Article.Content,
 			&Article.CreatedAt,
-			&Article.UpdatedAt)
+			&Article.UpdatedAt,
+			&nullhandler)
 		if err != nil {
 			panic(err.Error())
 		} else {
-			Articles = append(Articles, Article)
-		}
+			if nullhandler == '0' {
+				Article.PhotoPath = "-"
+			} else {
+				Article.PhotoPath = nullhandler
+			}
 
+		}
+		Articles = append(Articles, Article)
 	}
 
 	var count int
@@ -102,6 +109,8 @@ func FindAllArticles(limitstart string, limit string) ([]models.Article, int, er
 
 func FindArticle(articleid string) (models.Article, error) {
 	var Article models.Article
+	var nullhandler string
+
 	id, err := strconv.Atoi(articleid)
 	if err != nil {
 		Println("format ID salah")
@@ -115,10 +124,17 @@ func FindArticle(articleid string) (models.Article, error) {
 			&Article.AuthorID,
 			&Article.Content,
 			&Article.CreatedAt,
-			&Article.UpdatedAt)
+			&Article.UpdatedAt,
+			&nullhandler)
 	if err != nil {
 		Println(err.Error())
 		return Article, err
+	} else {
+		if nullhandler == "0" {
+			Article.PhotoPath = "-"
+		} else {
+			Article.PhotoPath = nullhandler
+		}
 	}
 
 	return Article, nil

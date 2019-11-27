@@ -81,13 +81,13 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	timeNow := Sprintf(time.Now().Format("2006-01-02"))
-	filename := fmt.Sprintf("%s-%s%s",
+	article.PhotoPath = fmt.Sprintf("%s-%s%s",
 		article.Title,
 		timeNow,
 		filepath.Ext(handler.Filename))
 
-	article.PhotoPath = filepath.Join(dir, "public/articlephotos", filename)
-	targetFile, err := os.OpenFile(article.PhotoPath, os.O_WRONLY|os.O_CREATE, 0666)
+	fileLocation := filepath.Join(dir, "public/articlephotos", article.PhotoPath)
+	targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		json.NewEncoder(w).Encode(err.Error())
 
